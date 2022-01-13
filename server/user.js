@@ -1,4 +1,4 @@
-export let avatar_list = {
+let avatar_list = {
     'king': {
         'growth-rate': 3,
         'hardwork': 30,
@@ -7,7 +7,7 @@ export let avatar_list = {
     }
 };
 
-export class User {
+class User {
     constructor(name, avatar) {
         this.name = name;
         this.avatar = avatar;
@@ -19,3 +19,5 @@ export class User {
         this.diamond = 0;
     }
 }
+
+module.exports = { User, avatar_list };

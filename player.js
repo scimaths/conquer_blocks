@@ -1,12 +1,12 @@
 export class Player {
-    constructor(user) {
+    constructor(user,x,y) {
         this.user = user;
         this.id = user.playersCreated;
         user.playersCreated += 1;
-        user.playerList.append(this);
+        user.playerList.push(this);
         
-        this.x = 0;
-        this.y = 0;
+        this.x = x;
+        this.y = y;
         this.health = 100;
     }
 
