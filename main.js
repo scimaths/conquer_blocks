@@ -56,6 +56,7 @@ var scene;
 // Board object to store blocks and player lists
 var gameBoard;
 var gameBoardSet = false;
+var block_sprites = new Array(10);
 
 // Textboxes to show resources
 var ironText, diamondText;
@@ -63,7 +64,6 @@ var ironText, diamondText;
 // Load assets - FIXED
 function preload() {
 	for (const [key, value] of Object.entries(block_list)) {
-		console.log('value: '+value)
 		this.load.image(key, value['image']);
 	}
 	this.load.image('currplayer', 'assets/Soldiers/Attack (10).png');
@@ -98,25 +98,35 @@ function submitMoves() {
 
 async function create() {
 	scene = this;
-	playersGroup = this.physics;
-	plusGroup = this.physics;
-	blockGroup = this.physics;
-	console.log(blockGroup);
 	socket.emit('ready', 'XYZ');
 	var width = 70;
 	
-	ironText = this.add.text(900, 16, 'Iron: 0', { fontSize: '32px', fill: '#000' });
-	diamondText = this.add.text(900, 40, 'Diamond: 0', { fontSize: '32px', fill: '#000' });
+	ironText = this.add.text(800, 16, 'Iron: 0', { fontSize: '15px', fill: '#FFF' });
+	diamondText = this.add.text(800, 40, 'Diamond: 0', { fontSize: '15px', fill: '#FFF' });
 
 	this.input.on('gameobjectdown', (pointer, gameObject) => {
-		if (gameBoardSet) {
+		if (lastSetTint && (String(lastSetTint.name).length == 1 || String(lastSetTint.name).substring(1, 2) != " ")) {
+			if (gameObject.name.length == 9) {
+				
+			}
+		}
+		
+		if(String(gameObject.name).length <=2){
 			lastSetTint = gameObject;
-			if (gameObject.name && gameObject.name.splice(4, 4) == "plus") {
-				var xpos = parseInt(gameObject.name.splice(0, 1));
-				var ypos = parseInt(gameObject.name.splice(2, 1));
+			gameObject.setTint(0xff0000);
+			console.log(gameObject.name)
+			var x_index = gameObject.x
+			console.log(gameObject.x + " " + gameObject.y)
 
+			// block_sprites
+		}
+
+		if (gameBoardSet) {
+			if (gameObject.name && gameObject.name.substring(4, 8) == "plus") {
+				var xpos = parseInt(gameObject.name.substring(0, 1));
+				var ypos = parseInt(gameObject.name.substring(2, 3));
 				if (selfPlayer.iron >= selfPlayer.properties['iron_per_soldier']) {
-					new_player = new Player(selfPlayer, xpos, ypos);
+					var new_player = new Player(selfPlayer, xpos, ypos);
 					thisRoundMoves['playersCreated'][new_player.id] = new_player;
 					selfPlayer.iron -= selfPlayer.properties['iron_per_soldier'];
 					ironText.setText("Iron: " + String(selfPlayer.iron));
@@ -129,19 +139,23 @@ async function create() {
 socket.on('gameBoardObject', gameBoardObject => {
 	gameBoard = gameBoardObject;
 	gameBoardSet = true;
-	console.log(gameBoard);
 	var width = 70;
 	for (let i = 0; i < gameBoard.width; i++) {
+		block_sprites[i]=new Array(10)
 		for (let j = 0; j < gameBoard.height; j++) {
-			let k = blockGroup.add.sprite(50 + width*i, 50 + width*j, gameBoard.map[i][j].name).setScale(width/512).setInteractive();
+			//console.log(block_sprites)
+			let k = scene.physics.add.sprite(50 + width*i, 50 + width*j, gameBoard.map[i][j].name).setScale(width/512).setInteractive();
+			k.setName(String(i) + " " + String(j) + " " + "block");
+			block_sprites[i][j]=k
 		}
 	}
+	refreshBoard(gameBoardObject, selfPlayer);
 })
 
 
 // Updating the frame
 async function update() {
-// 	this.game_time++
+	this.game_time++
 
 // 	if(this.game_time%(60*15)==0) {
 // // const d = new Date();
@@ -161,47 +175,48 @@ async function update() {
 // 	}
 }
 // refreshBoard
-socket.on('refreshBoard', (board, selfPlayerReceived) => {
+
+function refreshBoard (board, selfPlayerReceived) {
 	// first we destroy all the existing sprites on the board
 	
 	gameBoard = board;
-	
-	for(sprite in spritesCurr){
-		sprite.destroy();
-	}
-	
+
 	selfPlayer = selfPlayerReceived;
 	ironText.setText("Iron: " + String(selfPlayer.iron))
 	diamondText.setText("Diamond: " + String(selfPlayer.diamond))
 
 	spritesCurr = []
+
+	var width = 70;
 	
 	for (let y = 0; y < board.height; y++) {
 		for (let x = 0; x < board.width; x++) {
 			// get the blocks
-			block = board.map[x][y]
-			players = block.playerList
+			var block = board.map[x][y]
+			var players = block.playerList
 			var plusCreated = false;
-			for(player of players){
-				if(player.user.name == selfPlayer.name){
-					let v = playersGroup.add.sprite(50 + width*x - 10, 50 + width*y, 'currplayer').setScale(0.06).setInteractive();
+			for(var player of players){
+				if(player.name == selfPlayer.name){
+					let v = scene.physics.add.sprite(50 + width*x - 10, 50 + width*y + 10, 'currplayer').setScale(0.06).setInteractive();
 					v.setName(player.id)
 					spritesCurr.push(v);
 					if (!plusCreated) {
-						let pl = plusGroup.add.sprite(50 + width*x + 10, 50 + width*y - 10, 'plus').setScale(0.05).setInteractive();
+						let pl = scene.physics.add.sprite(50 + width*x + 20, 50 + width*y - 20, 'plus').setScale(0.05).setInteractive();
 						pl.setName(String(x) + " " + String(y) + " plus");
 						spritesCurr.push(pl);
 					}
 				}
 				else{
-					let v = playersGroup.add.sprite(50 + width*x + 10, 50 + width*y, 'oppplayer').setScale(0.06).setInteractive();
+					let v = scene.physics.add.sprite(50 + width*x + 10, 50 + width*y + 10, 'oppplayer').setScale(0.06).setInteractive();
 					v.setName("Opponent");	
 					spritesCurr.push(v)
 				}	
 			}	
 		}
 	}
-})
+}
+
+socket.on('refreshBoard', (board, selfPlayerReceived) => refreshBoard(board, selfPlayerReceived));
 
 // /** Connect to Moralis server */
 // const serverUrl = "https://uziynvgk9swe.usemoralis.com:2053/server";

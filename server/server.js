@@ -33,9 +33,10 @@ io.on('connection', socket => {
 
     if (users.length == 2) {
         gameBoard = new Board(10, 10);
-        var player1 = new Player(users[0], 0, 0)
-        var player2 = new Player(users[1], 9, 0)
-        
+        var player1 = new Player(users[0], 1, 0)
+        var player2 = new Player(users[1], 7, 3)
+        gameBoard.map[0][0].playerList.push(player1);
+        gameBoard.map[9][0].playerList.push(player2);
         io.emit('bothPlayersInfo', users);
         
         console.log('Info sent to both')
