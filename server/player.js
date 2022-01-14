@@ -1,13 +1,12 @@
 class Player {
-    constructor(user,x,y) {
-        this.user = user;
+    constructor(user, x, y) {
         this.id = user.playersCreated;
         user.playersCreated += 1;
-        user.playerList.push(this);
-        
+        this.name = user.name;
         this.x = x;
         this.y = y;
         this.health = 100;
+        user.playerList.push(this);
     }
 
     move_to (x, y, board) {

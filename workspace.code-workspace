@@ -1,0 +1,136 @@
+{
+	"folders": [
+		{
+			"path": "../../isurp/delight"
+		},
+		{
+			"path": "../../surp/resume-git"
+		},
+		{
+			"path": ".."
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"iostream": "cpp",
+			"deque": "cpp",
+			"string": "cpp",
+			"vector": "cpp",
+			"tuple": "cpp",
+			"thread": "cpp",
+			"cstdio": "cpp",
+			"any": "cpp",
+			"array": "cpp",
+			"atomic": "cpp",
+			"bit": "cpp",
+			"*.tcc": "cpp",
+			"bitset": "cpp",
+			"cctype": "cpp",
+			"cfenv": "cpp",
+			"charconv": "cpp",
+			"chrono": "cpp",
+			"cinttypes": "cpp",
+			"clocale": "cpp",
+			"cmath": "cpp",
+			"codecvt": "cpp",
+			"complex": "cpp",
+			"condition_variable": "cpp",
+			"csetjmp": "cpp",
+			"csignal": "cpp",
+			"cstdarg": "cpp",
+			"cstddef": "cpp",
+			"cstdint": "cpp",
+			"cstdlib": "cpp",
+			"cstring": "cpp",
+			"ctime": "cpp",
+			"cuchar": "cpp",
+			"cwchar": "cpp",
+			"cwctype": "cpp",
+			"forward_list": "cpp",
+			"list": "cpp",
+			"map": "cpp",
+			"set": "cpp",
+			"unordered_map": "cpp",
+			"unordered_set": "cpp",
+			"exception": "cpp",
+			"algorithm": "cpp",
+			"functional": "cpp",
+			"iterator": "cpp",
+			"memory": "cpp",
+			"memory_resource": "cpp",
+			"numeric": "cpp",
+			"optional": "cpp",
+			"random": "cpp",
+			"ratio": "cpp",
+			"regex": "cpp",
+			"string_view": "cpp",
+			"system_error": "cpp",
+			"type_traits": "cpp",
+			"utility": "cpp",
+			"fstream": "cpp",
+			"future": "cpp",
+			"initializer_list": "cpp",
+			"iomanip": "cpp",
+			"iosfwd": "cpp",
+			"istream": "cpp",
+			"limits": "cpp",
+			"mutex": "cpp",
+			"new": "cpp",
+			"ostream": "cpp",
+			"scoped_allocator": "cpp",
+			"shared_mutex": "cpp",
+			"sstream": "cpp",
+			"stdexcept": "cpp",
+			"streambuf": "cpp",
+			"typeindex": "cpp",
+			"typeinfo": "cpp",
+			"valarray": "cpp",
+			"variant": "cpp",
+			"cassert": "cpp",
+			"ccomplex": "cpp",
+			"cerrno": "cpp",
+			"cfloat": "cpp",
+			"ciso646": "cpp",
+			"climits": "cpp",
+			"cstdalign": "cpp",
+			"cstdbool": "cpp",
+			"ctgmath": "cpp",
+			"filesystem": "cpp",
+			"ios": "cpp",
+			"locale": "cpp",
+			"queue": "cpp",
+			"stack": "cpp",
+			"version": "cpp"
+		},
+		"java.project.sourcePaths": [
+			""
+		]
+	},
+	"launch": {
+		"version": "0.2.0",
+		"configurations": [
+
+			{
+				"name": "g++ - Build and debug active file",
+				"type": "cppdbg",
+				"request": "launch",
+				"program": "${fileDirname}/${fileBasenameNoExtension}",
+				"args": ["-lsfml-window -lsfml-system -lsfml-graphics -fopenmp -O2"],
+				"stopAtEntry": false,
+				"cwd": "${fileDirname}",
+				"environment": [],
+				"externalConsole": false,
+				"MIMode": "gdb",
+				"setupCommands": [
+					{
+						"description": "Enable pretty-printing for gdb",
+						"text": "-enable-pretty-printing",
+						"ignoreFailures": true
+					}
+				],
+				"preLaunchTask": "C/C++: g++ build active file",
+				"miDebuggerPath": "/usr/bin/gdb"
+			}
+		]
+	}
+}

@@ -7,13 +7,15 @@ import { User } from "./user.js";
 
 var config = {
 	type: Phaser.AUTO,
-	width: 1600,
-	default: 'arcade',
-	arcade: {
-		gravity: { y: 300 },
-		debug: true
-	}
-	,
+	height: 720,
+	width: 960,
+	physics: {
+        default: 'arcade',
+        arcade: {
+            gravity: { y: 0 },
+            debug: true
+        }
+    },
 	scene: {
 		preload: preload,
 		create: create,
@@ -48,9 +50,12 @@ var bothPlayersReady = false;
 // To add player sprites and plus sprites
 var playersGroup;
 var plusGroup;
+var blockGroup;
+var scene;
 
 // Board object to store blocks and player lists
 var gameBoard;
+var gameBoardSet = false;
 
 // Textboxes to show resources
 var ironText, diamondText;
@@ -71,19 +76,15 @@ socket.on('userDetails', user => {
 })
 
 socket.on('bothPlayersInfo', userInfo => {
-	for (key of Object.keys(userInfo)) {
-		if (key == userNameSelf) {
-			selfPlayer = userInfo[key];
+	for (let user of userInfo) {
+		if (user.name == userNameSelf) {
+			selfPlayer = user;
 		}
 		else {
-			opponentPlayer = userInfo[key];
+			opponentPlayer = user;
 		}
 	}
 	bothPlayersReady = true;
-})
-
-socket.on('gameBoardObject', gameBoardObject => {
-	gameBoard = gameBoardObject;
 })
 
 function submitMoves() {
@@ -96,44 +97,69 @@ function submitMoves() {
 }
 
 async function create() {
-	playersGroup = this.physics.add.group();
-	var width = 100;
+	scene = this;
+	playersGroup = this.physics;
+	plusGroup = this.physics;
+	blockGroup = this.physics;
+	console.log(blockGroup);
+	socket.emit('ready', 'XYZ');
+	var width = 70;
 	
-	ironText = this.add.text(16, 16, 'Iron: 0', { fontSize: '32px', fill: '#000' });
-	diamondText = this.add.text(16, 40, 'Diamond: 0', { fontSize: '32px', fill: '#000' });
-
-	for (let i = 0; i < gameBoard.width; i++) {
-		for (let j = 0; j < gameBoard.height; j++) {
-			k = this.add.sprite(50 + width*i, 50 + width*j, gameBoard.getBlock(i, j).name).setScale(width/512).setInteractive();
-		}
-	}
+	ironText = this.add.text(900, 16, 'Iron: 0', { fontSize: '32px', fill: '#000' });
+	diamondText = this.add.text(900, 40, 'Diamond: 0', { fontSize: '32px', fill: '#000' });
 
 	this.input.on('gameobjectdown', (pointer, gameObject) => {
-		lastSetTint = gameObject;
-		if (gameObject.name.splice(4, 4) == "plus") {
-			var xpos = parseInt(gameObject.name.splice(0, 1));
-			var ypos = parseInt(gameObject.name.splice(2, 1));
+		if (gameBoardSet) {
+			lastSetTint = gameObject;
+			if (gameObject.name && gameObject.name.splice(4, 4) == "plus") {
+				var xpos = parseInt(gameObject.name.splice(0, 1));
+				var ypos = parseInt(gameObject.name.splice(2, 1));
 
-			if (selfPlayer.iron >= selfPlayer.properties['iron_per_soldier']) {
-				new_player = new Player(selfPlayer, xpos, ypos);
-				thisRoundMoves['playersCreated'][new_player.id] = new_player;
-				selfPlayer.iron -= selfPlayer.properties['iron_per_soldier'];
-				ironText.setText("Iron: " + String(selfPlayer.iron));
+				if (selfPlayer.iron >= selfPlayer.properties['iron_per_soldier']) {
+					new_player = new Player(selfPlayer, xpos, ypos);
+					thisRoundMoves['playersCreated'][new_player.id] = new_player;
+					selfPlayer.iron -= selfPlayer.properties['iron_per_soldier'];
+					ironText.setText("Iron: " + String(selfPlayer.iron));
+				}
 			}
 		}
 	})
 }
 
+socket.on('gameBoardObject', gameBoardObject => {
+	gameBoard = gameBoardObject;
+	gameBoardSet = true;
+	console.log(gameBoard);
+	var width = 70;
+	for (let i = 0; i < gameBoard.width; i++) {
+		for (let j = 0; j < gameBoard.height; j++) {
+			let k = blockGroup.add.sprite(50 + width*i, 50 + width*j, gameBoard.map[i][j].name).setScale(width/512).setInteractive();
+		}
+	}
+})
+
 
 // Updating the frame
 async function update() {
-	this.game_time++
-	if(this.game_time%60==0) {
-		const d = new Date();
-		let time = d.getTime();
-	}
-}
+// 	this.game_time++
 
+// 	if(this.game_time%(60*15)==0) {
+// // const d = new Date();
+// 		// let time = d.getTime();
+// his.input.on('gameobjectdown
+// 	if("player" in gameObject.name ){
+
+
+// 		if (lastSetTint) {
+// 			lastSetTint.clearTint();
+// 		}
+// 		console.log('OK');
+// 		socket.emit('update', 'Alpha')
+// 		gameObject.setTint(0xff0000);
+// 		lastSetTint = gameObject;	}'
+// if		)
+// 	}
+}
 // refreshBoard
 socket.on('refreshBoard', (board, selfPlayerReceived) => {
 	// first we destroy all the existing sprites on the board
@@ -153,7 +179,7 @@ socket.on('refreshBoard', (board, selfPlayerReceived) => {
 	for (let y = 0; y < board.height; y++) {
 		for (let x = 0; x < board.width; x++) {
 			// get the blocks
-			block = board.getBlock(x,y)
+			block = board.map[x][y]
 			players = block.playerList
 			var plusCreated = false;
 			for(player of players){
@@ -243,13 +269,13 @@ socket.on('refreshBoard', (board, selfPlayerReceived) => {
 	// 	}
 	
 	// 	this.input.on('gameobjectdown', (pointer, gameObject)=>{
-	// 		if (lastSetTint) {
-	// 			lastSetTint.clearTint();
-	// 		}
-	// 		console.log('OK');
-	// 		socket.emit('update', 'Alpha')
-	// 		gameObject.setTint(0xff0000);
-	// 		lastSetTint = gameObject;
+			// if (lastSetTint) {
+			// 	lastSetTint.clearTint();
+			// }
+			// console.log('OK');
+			// socket.emit('update', 'Alpha')
+			// gameObject.setTint(0xff0000);
+			// lastSetTint = gameObject;
 	// 		console.log('game object: '+gameObject);
 	// 		console.log('pointer: '+pointer);
 	// 	})
