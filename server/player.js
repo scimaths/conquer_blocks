@@ -1,5 +1,5 @@
-export class Player {
-    constructor(user, x, y) {
+class Player {
+    constructor(user,x,y) {
         this.user = user;
         this.id = user.playersCreated;
         user.playersCreated += 1;
@@ -16,3 +16,5 @@ export class Player {
         board.getBlock(x, y).playerList.push(this);
     }
 }
+
+module.exports = { Player };

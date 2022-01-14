@@ -1,9 +1,10 @@
 export let avatar_list = {
     'king': {
-        'growth-rate': 3,
+        'growth_rate': 3,
         'hardwork': 30,
         'storage': 40000,
-        'war-strength': 10,
+        'war_strength': 10,
+        'iron_per_soldier': 100,
     }
 };
 

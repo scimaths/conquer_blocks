@@ -1,7 +1,7 @@
-import { Block } from './block.js';
+const { Block } = require('./block.js')
 
-export class Board{
-    constructor(height, width) {
+class Board {
+    constructor(height,width) {
         this.height = height;
         this.width = width;
         this.map = new Array(this.height);
@@ -21,3 +21,5 @@ export class Board{
 
     }
 };
+
+module.exports = { Board };
