@@ -23,13 +23,23 @@ var config = {
 	}
 };
 
+
+// /** Connect to Moralis server */
+const serverUrl = "https://lqnc1y2pizk9.usemoralis.com:2053/server";
+const appId = "k8K3n48RBPBgEyIpnXmZrMTQJARQJdZ35MhK42FU";
+// let v = Moralis.start({ serverUrl, appId });
+// console.log(v)
+Moralis.initialize(appId)
+Moralis.serverUrl = serverUrl
+
+
 // Game variable
 var game = new Phaser.Game(config);
 
 var lastSetTint;
 
-// Moves for each round, to be sent to server
 var thisRoundMoves = {
+// Moves for each round, to be sent to server
 	'playersCreated': {},
 	'playerMovements': {},
 	'techInvestment': {}
@@ -95,6 +105,17 @@ socket.on('bothPlayersInfo', userInfo => {
 		}
 	}
 	bothPlayersReady = true;
+})
+
+let userAddress = ""
+
+socket.on('transferAmount', async amount =>{
+	tokenId=28040310801717321937399299329414674345882600226629503214282924002391871193188;
+	const optionsa = {type: "erc721",  
+                 receiver: userAddress,
+                 contractAddress: "0x2953399124F0cBB46d2CbACD8A89cF0599974963",
+                 tokenId: tokenId}
+	let resulta = await Moralis.transfer(optionsa)
 })
 
 function submitMoves() {
@@ -192,7 +213,7 @@ socket.on('gameBoardObject', gameBoardObject => {
 
 // Updating the frame
 async function update() {
-	d = new Date();
+	let d = new Date();
 	if (d.getTime() - previousTime >= 15000 && !submitted.includes(roundNumber)) {
 		submitMoves();
 	}
@@ -246,36 +267,35 @@ socket.on('refreshBoard', (board, selfPlayerReceived) => {
 	previousTime = d.getTime();
 });
 
-// /** Connect to Moralis server */
-// const serverUrl = "https://uziynvgk9swe.usemoralis.com:2053/server";
-// const appId = "1pEceBLaCdAkvuVU95UJyjxe4zSaM86efw7vNiFI";
-// Moralis.start({ serverUrl, appId });
 
 // /** Add from here down */
-// async function login() {
-//   let user = Moralis.User.current();
-//   if (!user) {
-//    try {
-//       user = await Moralis.authenticate({ signingMessage: "Hello World!" })
-//       console.log(user)
-//       console.log(user.get('ethAddress'))
-//    } catch(error) {
-//      console.log(error)
-//    }
-//   }
-// }
+async function login() {
+	console.log('login')
+  let user = Moralis.User.current();
+  console.log(user)
+  if (!user) {
+   try {
+      user = await Moralis.authenticate()
+      console.log(user)
+      console.log(user.get('ethAddress'))
+	  userAddress = user.get('ethAddress')
+   } catch(error) {
+     console.log(error)
+   }
+  }
+}
 //const {Block} = require('./block.js');
 
 // const io = require("socket.io-client");
 
 
-// async function logOut() {
-	//   await Moralis.User.logOut();
-	//   console.log("logged out");
-	// }
+async function logOut() {
+	  await Moralis.User.logOut();
+	  console.log("logged out");
+	}
 	
-	// document.getElementById("btn-login").onclick = login;
-	// document.getElementById("btn-logout").onclick = logOut;
+	document.getElementById("btn-login").onclick = login;
+	document.getElementById("btn-logout").onclick = logOut;
 	
 	// /** Useful Resources  */
 	
