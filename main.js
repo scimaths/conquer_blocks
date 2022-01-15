@@ -126,7 +126,7 @@ async function create() {
 					lastSetTint.setPosition(gameObject.x-10,gameObject.y+10)
 					moved_pieces.push(String(lastSetTint.name))
 					// this.physics.moveTo(lastSetTint,gameObject.x,gameObject.y)
-					thisRoundMoves['playerMovements'][String(lastSetTint.name)] = ((gameObject.x-40)/width, (gameObject.y-60)/width);
+					thisRoundMoves['playerMovements'][parseInt(lastSetTint.name)] = ((gameObject.x-40)/width, (gameObject.y-60)/width);
 				}
 			}
 		}

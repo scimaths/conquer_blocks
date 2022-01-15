@@ -9,10 +9,11 @@ class Player {
         user.playerList.push(this);
     }
 
-    move_to (x, y, board) {
+    move_to(x, y, board) {
+        board.map[this.x, this.y].removePlayer(this.id);
         this.x = x;
         this.y = y;
-        board.getBlock(x, y).playerList.push(this);
+        board.map[x, y].playerList.push(this);
     }
 }
 

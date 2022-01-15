@@ -37,6 +37,17 @@ export class Block {
         this.playerList = [];
     }
 
+    removePlayer(playerID) {
+        cnt = 0
+        for (var player of this.playerList) {
+            if (player.id == playerID) {
+                this.playerList = this.playerList.splice(cnt, 1);
+                break;
+            }
+            cnt += 1
+        }
+    }
+
     // Processing event block-by-block
     processEvent() {
 

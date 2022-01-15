@@ -22,7 +22,7 @@ const io = socketio(server, {
 var users = []
 var movesOverRounds = {}
 
-var roundNumber = 0;
+var roundNumber = 1;
 var gameBoard;
 
 io.on('connection', socket => {
@@ -60,9 +60,45 @@ io.on('connection', socket => {
         }
     })
     
-    socket.on('roundMoveUpdates', movesForRound => {
-        roundNumber += 1;
-        movesOverRounds[roundNumber] = movesForRound;
+    socket.on('moveSubmission', movesForRound => {
+        movesOverRounds[roundNumber][socket.id] = movesForRound;
+        if (Object.keys(movesOverRounds[roundNumber]).length == 2) {
+            for (var user of users) {
+                userMoves = movesOverRounds[roundNumber][user.name]
+
+                creationArray = Object.keys(userMoves['playersCreated'])
+                creationArray.sort()
+                for (var newPlayerID of creationArray) {
+                    x = usersMoves['playersCreated'][newPlayerID].x
+                    y = usersMoves['playersCreated'][newPlayerID].y
+                    var newUserPlayer = new Player(user.name, x, y)
+                    gameBoard.map[x][y].playerList.push(newUserPlayer)
+                    if (newUserPlayer.id != newPlayerID) {
+                        console.log("Assertion Error")
+                    }
+                }
+
+                movementArray = Object.keys(userMoves['playerMovements'])
+                movementArray.sort()
+                for (var movementID of movementArrat) {
+                    x = usersMoves['playerMovements'][movementID][0]
+                    y = usersMoves['playerMovements'][movementID][1]
+                    for (var player of user.playerList) {
+                        if (player.id == movementID) {
+                            player.move_to(x, y, gameBoard)
+                        }
+                    }
+                }
+            }
+
+            for (var y=0; y<10; ++y) {
+                for (var x=0; x<10; ++x) {
+                    gameBoard.map[y][x].processEvent()
+                }
+            }
+
+            roundNumber += 1
+        }
     })
 })
 
