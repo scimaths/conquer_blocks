@@ -87,7 +87,7 @@ var gameBoardSet = false;
 var block_sprites = new Array(10);
 
 // Textboxes to show resources
-var ironText, diamondText, techText;
+var ironText, diamondText, techText, roundText;
 
 
 // Time Variables
@@ -174,6 +174,7 @@ async function create() {
 	ironText = this.add.text(800, 16, 'Iron: 0', { fontSize: '15px', fill: '#FFF' });
 	diamondText = this.add.text(800, 40, 'Diamond: 0', { fontSize: '15px', fill: '#FFF' });
 	techText = this.add.text(800, 64, 'Technology: 0', { fontSize: '15px', fill: '#FFF' })
+	roundText = this.add.text(800, 64, 'Round: 0', { fontSize: '15px', fill: '#FFF' })
 	var player_selected = 0
 	
 	this.input.on('gameobjectdown', (pointer, gameObject) => {
@@ -216,6 +217,7 @@ async function create() {
 					selfPlayer.iron -= selfPlayer.properties['iron_per_soldier'];
 					ironText.setText("Iron: " + String(selfPlayer.iron));
 					techText.setText("Technology: " + String(selfPlayer.technology));
+					roundText.setText("Round: " + String(roundNumber));
 				}
 			}
 		}
@@ -312,6 +314,7 @@ socket.on('refreshBoard', (board, users) => {
 	refreshBoard(board, selfPlayerReceived);
 	moved_pieces = [];
 	roundNumber += 1;
+	roundText.setText("Round: " + String(roundNumber))
 	var d = new Date();
 	previousTime = d.getTime();
 });
