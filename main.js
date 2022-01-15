@@ -43,6 +43,8 @@ var selfPlayer, opponentPlayer;
 
 // Sprites in current round
 var spritesCurr = [];
+// stores moved pawns
+var moved_pieces = [];
 
 // Whether both players are ready
 var bothPlayersReady = false;
@@ -60,6 +62,14 @@ var block_sprites = new Array(10);
 
 // Textboxes to show resources
 var ironText, diamondText;
+
+
+// Time Variables
+var previousTime;
+var roundNumber = 0;
+
+var submitted = [];
+
 
 // Load assets - FIXED
 function preload() {
@@ -92,6 +102,7 @@ function submitMoves() {
 		'value': Math.min(parseInt(document.getElementById('tech_investment').value), selfPlayer.iron),
 	}
 	socket.emit('moveSubmission', thisRoundMoves);
+	submitted.push(roundNumber);
 	thisRoundMoves = {};
 	document.getElementById('tech_investment').value = 0;
 }
@@ -103,22 +114,42 @@ async function create() {
 	
 	ironText = this.add.text(800, 16, 'Iron: 0', { fontSize: '15px', fill: '#FFF' });
 	diamondText = this.add.text(800, 40, 'Diamond: 0', { fontSize: '15px', fill: '#FFF' });
-
+	var player_selected = 0
+	
 	this.input.on('gameobjectdown', (pointer, gameObject) => {
-		if (lastSetTint && (String(lastSetTint.name).length == 1 || String(lastSetTint.name).substring(1, 2) != " ")) {
+		if (lastSetTint && (String(lastSetTint.name).length <= 3) && !moved_pieces.includes(String(lastSetTint.name))) {
 			if (gameObject.name.length == 9) {
-				
+				console.log(gameObject.x)
+				console.log(lastSetTint.x)
+				var width = 70;
+				if(Math.round(Math.abs((gameObject.x-lastSetTint.x+10)/width))+Math.round(Math.abs((gameObject.y-lastSetTint.y-10)/width))==1){
+					lastSetTint.setPosition(gameObject.x-10,gameObject.y+10)
+					moved_pieces.push(String(lastSetTint.name))
+					// this.physics.moveTo(lastSetTint,gameObject.x,gameObject.y)
+					thisRoundMoves['playerMovements'][String(lastSetTint.name)] = ((gameObject.x-40)/width, (gameObject.y-60)/width);
+				}
 			}
 		}
 		
+		// lastSetTint.clearTint();
+		for(var i=0;i<10;i++)
+			for(var j=0;j<10;j++)
+				block_sprites[i][j].clearTint()
+		console.log(gameObject)
 		if(String(gameObject.name).length <=2){
+			player_selected = 1
 			lastSetTint = gameObject;
 			gameObject.setTint(0xff0000);
 			console.log(gameObject.name)
-			var x_index = gameObject.x
+			var width = 70;
+			var x_index = (gameObject.x-40)/width
+			var y_index = (gameObject.y-60)/width
 			console.log(gameObject.x + " " + gameObject.y)
-
-			// block_sprites
+			console.log(x_index + " " + y_index)
+			try{ block_sprites[x_index+1][y_index].setTint(0xffff00) } catch{}
+			try{ block_sprites[x_index][y_index+1].setTint(0xffff00) } catch{}
+			try{ block_sprites[x_index-1][y_index].setTint(0xffff00) } catch{}
+			try{ block_sprites[x_index][y_index-1].setTint(0xffff00) } catch{}
 		}
 
 		if (gameBoardSet) {
@@ -150,29 +181,21 @@ socket.on('gameBoardObject', gameBoardObject => {
 		}
 	}
 	refreshBoard(gameBoardObject, selfPlayer);
+	
+	var d = new Date();
+	firstBoardTime = d.getTime();
+	
+	// Entering round 1
+	roundNumber += 1;
 })
 
 
 // Updating the frame
 async function update() {
-	this.game_time++
-
-// 	if(this.game_time%(60*15)==0) {
-// // const d = new Date();
-// 		// let time = d.getTime();
-// his.input.on('gameobjectdown
-// 	if("player" in gameObject.name ){
-
-
-// 		if (lastSetTint) {
-// 			lastSetTint.clearTint();
-// 		}
-// 		console.log('OK');
-// 		socket.emit('update', 'Alpha')
-// 		gameObject.setTint(0xff0000);
-// 		lastSetTint = gameObject;	}'
-// if		)
-// 	}
+	d = new Date();
+	if (d.getTime() - previousTime >= 15000 && !submitted.includes(roundNumber)) {
+		submitMoves();
+	}
 }
 // refreshBoard
 
@@ -216,7 +239,12 @@ function refreshBoard (board, selfPlayerReceived) {
 	}
 }
 
-socket.on('refreshBoard', (board, selfPlayerReceived) => refreshBoard(board, selfPlayerReceived));
+socket.on('refreshBoard', (board, selfPlayerReceived) => {
+	refreshBoard(board, selfPlayerReceived);
+	roundNumber += 1;
+	var d = new Date();
+	previousTime = d.getTime();
+});
 
 // /** Connect to Moralis server */
 // const serverUrl = "https://uziynvgk9swe.usemoralis.com:2053/server";

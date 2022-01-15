@@ -42,6 +42,9 @@ movesForRound = {
 
 
 record time.time() after first refresh
+
+
+
 check in update if diff of time > 15 seconds or player clicks submit
 if yes, send movesForRound to server
 wait for output of server
