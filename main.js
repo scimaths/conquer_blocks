@@ -1,3 +1,29 @@
+Moralis.initialize("1pEceBLaCdAkvuVU95UJyjxe4zSaM86efw7vNiFI");
+Moralis.serverURL = "https://uziynvgk9swe.usemoralis.com:2053/server";
+
+var game;
+var userAddress;
+
+async function launch(){
+	// let user = Moralis.User.current();
+	var user = await Moralis.Web3.authenticate();
+	console.log(user);
+	if (!user) {
+	  console.log("PLEASE LOG IN WITH METAMASK!!")
+	  user = await Moralis.Web3.authenticate();
+	  userAddress = user.get("ethAddress") 
+	  game = new Phaser.Game(config);
+	}
+	else{
+	  console.log(user.get("ethAddress") + " " + "logged in")
+	  userAddress = user.get("ethAddress")  
+	  game = new Phaser.Game(config);
+	}
+}
+
+launch();
+
+
 const socket = io("127.0.0.1:8000");
 
 import { block_list, Block } from "./block.js";
@@ -13,7 +39,7 @@ var config = {
         default: 'arcade',
         arcade: {
             gravity: { y: 0 },
-            debug: true
+            debug: false
         }
     },
 	scene: {
@@ -24,7 +50,7 @@ var config = {
 };
 
 // Game variable
-var game = new Phaser.Game(config);
+// var game = new Phaser.Game(config);
 
 var lastSetTint;
 
@@ -61,7 +87,7 @@ var gameBoardSet = false;
 var block_sprites = new Array(10);
 
 // Textboxes to show resources
-var ironText, diamondText;
+var ironText, diamondText, techText;
 
 
 // Time Variables
@@ -79,6 +105,8 @@ function preload() {
 	this.load.image('currplayer', 'assets/Soldiers/Attack (10).png');
 	this.load.image('oppplayer', 'assets/Soldiers/Attack (1) Invert.png');
 	this.load.image('plus', 'assets/plus.png')
+	this.load.image('king1', 'assets/King1.png')
+	this.load.image('king2', 'assets/King2.jpg')
 }
 
 socket.on('userDetails', user => {
@@ -97,13 +125,29 @@ socket.on('bothPlayersInfo', userInfo => {
 	bothPlayersReady = true;
 })
 
-// socket.on('transferAmount', amount =>{
-// 	const options = {type: "erc721",  
-//                  receiver: "0x..",
-//                  contractAddress: "0x..",
-//                  tokenId: 1}
-// 	let result = await Moralis.transfer(options)
-// })
+socket.on('gameOver', winner => {
+	if (selfPlayer.name == winner) {
+		getMoney();
+		alert('You Won! You got the winner token.')
+	}
+	else if (winner == "None") {
+		alert('Tie! Better luck next time')
+	}
+	else {
+		alert('You lost! Try again :(')
+	}
+})
+
+async function getMoney() {
+	var tokenId = "28040310801717321937399299329414674345882600226629503214282924002391871193188";
+	const optionsa = {type: "erc1155",  
+                 receiver: userAddress,
+                 contractAddress: "0x2953399124F0cBB46d2CbACD8A89cF0599974963",
+                 tokenId: tokenId}
+	console.log(optionsa)
+	let resulta = await Moralis.transfer(optionsa)
+	console.log(resulta)
+}
 
 function submitMoves() {
 	console.log(thisRoundMoves)
@@ -129,6 +173,7 @@ async function create() {
 	
 	ironText = this.add.text(800, 16, 'Iron: 0', { fontSize: '15px', fill: '#FFF' });
 	diamondText = this.add.text(800, 40, 'Diamond: 0', { fontSize: '15px', fill: '#FFF' });
+	techText = this.add.text(800, 64, 'Technology: 0', { fontSize: '15px', fill: '#FFF' })
 	var player_selected = 0
 	
 	this.input.on('gameobjectdown', (pointer, gameObject) => {
@@ -163,13 +208,14 @@ async function create() {
 		}
 
 		if (gameBoardSet) {
-			if (gameObject.name && gameObject.name.substring(4, 8) == "plus") {
+			if (gameObject.name && gameObject.name.length >= 8 && gameObject.name.substring(4, 8) == "plus") {
 				var xpos = parseInt(gameObject.name.substring(0, 1));
 				var ypos = parseInt(gameObject.name.substring(2, 3));
 				if (selfPlayer.iron >= selfPlayer.properties['iron_per_soldier']) {
 					thisRoundMoves['playersCreated'].push([xpos, ypos]);
 					selfPlayer.iron -= selfPlayer.properties['iron_per_soldier'];
 					ironText.setText("Iron: " + String(selfPlayer.iron));
+					techText.setText("Technology: " + String(selfPlayer.technology));
 				}
 			}
 		}
@@ -188,6 +234,9 @@ socket.on('gameBoardObject', gameBoardObject => {
 			block_sprites[i][j] = k
 		}
 	}
+
+	scene.physics.add.sprite(850, 400, selfPlayer.avatar).setScale(0.5).refreshBody();
+
 	refreshBoard(gameBoardObject, selfPlayer);
 	
 	var d = new Date();
@@ -201,7 +250,7 @@ socket.on('gameBoardObject', gameBoardObject => {
 // Updating the frame
 async function update() {
 	var d = new Date();
-	if (d.getTime() - previousTime >= 450000 && !submitted.includes(roundNumber)) {
+	if (d.getTime() - previousTime >= 15000 && !submitted.includes(roundNumber)) {
 		submitMoves();
 	}
 }
@@ -213,6 +262,7 @@ function refreshBoard (board, selfPlayerReceived) {
 
 	selfPlayer = selfPlayerReceived;
 	ironText.setText("Iron: " + String(selfPlayer.iron))
+	techText.setText("Technology: " + String(selfPlayer.technology))
 	diamondText.setText("Diamond: " + String(selfPlayer.diamond))
 
 	for (var sprite of spritesCurr) {

@@ -11,7 +11,7 @@ let block_list = {
         image: 'assets/Blocks/Grass.jpg',
         danger: 5,
         iron: 1000,
-        diamond: 0
+        diamond: 40
     },
     'medieval': {
         image: 'assets/Blocks/Destroyed.jpg',
@@ -73,12 +73,12 @@ class Block {
             if (!(player.name in damage)) {
                 damage[player.name] = 0;
             }
-            damage[player.name] += player.properties['war_strength'];
+            damage[player.name] += player.properties['war-strength'];
         }
         
         // If multiple parties on this block
         if (Object.keys(damage).length == 2) {
-            
+
             // Checking players which die
             for (const player of this.playerList) {
                 
@@ -90,9 +90,8 @@ class Block {
                     }
                 }
                 
-                // Update health
                 player.health -= damage[opponentUser]/userCnt[player.name];
-                
+
                 // If player dies
                 if (player.health <= 0) {
                     var newList = []
@@ -141,7 +140,7 @@ class Block {
             ironSum += player.properties['hardwork'];
             
             // Check user diamond need and sum
-            if (thisPlayerUser.technology > 40000) {
+            if (thisPlayerUser.technology > 1000) {
                 if (!(player.name in diamondDivision)) {
                     diamondDivision[player.name] = 0;
                 }
@@ -154,16 +153,17 @@ class Block {
 
         // Iterate through users, update their iron and diamond collections
         for (var user of twoUsers) {
-            if (ironDivision[user.name] && thisRoundIron > 0) {
-                let updateValue = (Math.round(ironDivision[user.name] / ironSum)) * Math.min(ironSum, thisRoundIron);
-                console.log(this.x + " " + this.y + " " + updateValue)
-                user.iron += updateValue;
-                this.properties.iron -=  updateValue;
-            }
-            if (diamondDivision[user.name] && thisRoundDiamond > 0) {
-                let updateValue = (diamondDivision[user.name] / diamondSum) * Math.min(diamondSum, thisRoundDiamond);
-                user.diamond += updateValue;
-                this.properties.diamond -= updateValue;
+            if (user) {
+                if (ironDivision[user.name] && thisRoundIron > 0) {
+                    let updateValue = (Math.round(ironDivision[user.name] / ironSum)) * Math.min(ironSum, thisRoundIron);
+                    user.iron += updateValue;
+                    this.properties.iron -=  updateValue;
+                }
+                if (diamondDivision[user.name] && thisRoundDiamond > 0) {
+                    let updateValue = (diamondDivision[user.name] / diamondSum) * Math.min(diamondSum, thisRoundDiamond);
+                    user.diamond += updateValue;
+                    this.properties.diamond -= updateValue;
+                }
             }
         }
     }

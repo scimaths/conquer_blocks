@@ -25,18 +25,25 @@ var movesOverRounds = {}
 var roundNumber = 1;
 var gameBoard;
 
+var newUser;
+
 io.on('connection', socket => {
     console.log(socket.id + " has joined")
-    var newUser = new User(String(socket.id), 'king');
+    if (users.length == 0) {
+        newUser = new User(String(socket.id), 'king1');
+    }
+    else {
+        newUser = new User(String(socket.id), 'king2');    
+    }
     users.push(newUser);
     io.to(socket.id).emit('userDetails', socket.id)
 
     if (users.length == 2) {
         gameBoard = new Board(10, 10);
-        var player1 = new Player(users[0], 1, 0)
-        var player2 = new Player(users[1], 7, 3)
-        gameBoard.map[1][0].playerList.push(player1);
-        gameBoard.map[7][3].playerList.push(player2);
+        var player1 = new Player(users[0], 5, 5)
+        var player2 = new Player(users[1], 4, 5)
+        gameBoard.map[5][5].playerList.push(player1);
+        gameBoard.map[4][5].playerList.push(player2);
         io.emit('bothPlayersInfo', users);
         
         console.log('Info sent to both')
@@ -120,6 +127,19 @@ io.on('connection', socket => {
                 }
             }
             console.log("Result sent back for Round " + roundNumber);
+            if (roundNumber == 5) {
+                var winner;
+                if (users[0].diamond > users[1].diamond) {
+                    winner = String(users[0].name);
+                }
+                else if (users[0].diamond < users[1].diamond) {
+                    winner = String(users[1].name);
+                }
+                else {
+                    winner = "None";
+                }
+                io.emit('gameOver', winner);
+            }
             roundNumber += 1
         }
     })
