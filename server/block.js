@@ -1,3 +1,5 @@
+const e = require("express");
+
 let block_list = {
     'magma': {
         image: 'assets/Blocks/Rust.jpg',
@@ -25,7 +27,6 @@ let block_list = {
     }
 };
 
-
 class Block {
 
     // Constructor - Name, Position, Properties, Players
@@ -33,12 +34,12 @@ class Block {
         this.name = name;
         this.x = x;
         this.y = y;
-        this.properties = block_list[name];
+        this.properties = Object.create(block_list[name]);
         this.playerList = [];
     }
 
     // Processing event block-by-block
-    processEvent() {
+    processEvent(userOne, userTwo) {
 
         let thisRoundIron = this.properties.iron;
         let thisRoundDiamond = this.properties.diamond;
@@ -51,27 +52,28 @@ class Block {
         
         // Damage being given to other team
         let damage = {};
-        
+        let userCnt = {};
         
         // Calculating damage
         // For two players A and B, "A can do 60 damage to B" is stored as {A: 60}
-        for (const player of this.playerList) {
-            
+        for (const player of this.playerList) {   
             // Maintain list of users
             let userAdded = false;
-            for (user of users) {
-                if (player.user.name == user.name) {
+            for (var user of users) {
+                if (player.name == user.name) {
                     userAdded = true;
+                    userCnt[player.name] += 1;
                 }
             }
             if (!userAdded) {
-                users.push(player.user);
+                users.push(player.name);
+                userCnt[player.name] = 1;
             }
             
-            if (!(player.user.name in damage)) {
-                damage[player.user.name] = 0;
+            if (!(player.name in damage)) {
+                damage[player.name] = 0;
             }
-            damage[player.user.name] += player.user.war_strength;
+            damage[player.name] += player.properties['war_strength'];
         }
         
         // If multiple parties on this block
@@ -83,38 +85,39 @@ class Block {
                 // Name of opponent
                 let opponentUser = "whichPlayer";
                 for (const username of Object.keys(damage)) {
-                    if (username != player.user.name) {
+                    if (username != player.name) {
                         opponentUser = username;
                     }
                 }
                 
                 // Update health
-                player.health -= damage[opponentUser]/player.user.playerList.length;
+                player.health -= damage[opponentUser]/userCnt[player.name];
                 
                 // If player dies
                 if (player.health <= 0) {
-                    
-                    // Clear user's player list
-                    index = 0;
+                    var newList = []
                     for (const player_find of this.playerList) {
-                        if (player.id == player_find.id) {
-                            break;
+                        if (!(player.id == player_find.id)) {
+                            newList.push(player_find);
                         }
-                        index += 1;
                     }
-                    player.user.playerList.splice(index, 1);
+                    if (player.name == userOne.name) {
+                        userOne.playerList = newList;
+                    }
+                    else {
+                        userTwo.playerList = newList;
+                    }
                 }
                 else {
                     // Update next timestamp's list
                     this.updatedPlayerList.push(player);
                 }
             }
+            // Update list of alive players
+            this.playerList = this.updatedPlayerList;
+            this.updatedPlayerList = [];
         }
-        
-        // Update list of alive players
-        this.playerList = this.updatedPlayerList;
-        this.updatedPlayerList = [];
-        
+
         // Sum of material to be used by live players
         let ironSum = 0;
         let diamondSum = 0;
@@ -126,31 +129,38 @@ class Block {
         // Update sums and need for each user
         for (const player of this.playerList) {
 
+            var thisPlayerUser;
+            if (player.name == userOne.name) {thisPlayerUser = userOne;}
+            else {thisPlayerUser = userTwo;} 
+
             // Update user iron need and sum
-            if (!(player.user.name in ironDivision)) {
-                ironDivision[player.user.name] = 0;
+            if (!(player.name in ironDivision)) {
+                ironDivision[player.name] = 0;
             }
-            ironDivision[player.user.name] += player.user.properties.hardwork;
-            ironSum += player.user.properties.hardwork;
+            ironDivision[player.name] += player.properties['hardwork'];
+            ironSum += player.properties['hardwork'];
             
             // Check user diamond need and sum
-            if (player.user.technology > 40000) {
-                if (!(player.user.name in diamondDivision)) {
-                    diamondDivision[player.user.name] = 0;
+            if (thisPlayerUser.technology > 40000) {
+                if (!(player.name in diamondDivision)) {
+                    diamondDivision[player.name] = 0;
                 }
-                diamondDivision[player.user.name] += player.user.properties.hardwork / 10;
-                diamondSum += player.user.properties.hardwork / 10;
+                diamondDivision[player.name] += player.properties['hardwork'] / 10;
+                diamondSum += player.properties['hardwork'] / 10;
             }
         }
 
+        var twoUsers = [userOne, userTwo]
+
         // Iterate through users, update their iron and diamond collections
-        for (user of users) {
-            if ((user in Object.keys(ironDivision))) {
-                let updateValue = (ironDivision[user.name] / ironSum) * Math.min(ironSum, thisRoundIron);
+        for (var user of twoUsers) {
+            if (ironDivision[user.name] && thisRoundIron > 0) {
+                let updateValue = (Math.round(ironDivision[user.name] / ironSum)) * Math.min(ironSum, thisRoundIron);
+                console.log(this.x + " " + this.y + " " + updateValue)
                 user.iron += updateValue;
-                this.properties.iron -=  updateValue;  
+                this.properties.iron -=  updateValue;
             }
-            if ((user in Object.keys(diamondDivision))) {
+            if (diamondDivision[user.name] && thisRoundDiamond > 0) {
                 let updateValue = (diamondDivision[user.name] / diamondSum) * Math.min(diamondSum, thisRoundDiamond);
                 user.diamond += updateValue;
                 this.properties.diamond -= updateValue;

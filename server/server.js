@@ -27,7 +27,7 @@ var gameBoard;
 
 io.on('connection', socket => {
     console.log(socket.id + " has joined")
-    var newUser = new User(socket.id, 'king');
+    var newUser = new User(String(socket.id), 'king');
     users.push(newUser);
     io.to(socket.id).emit('userDetails', socket.id)
 
@@ -61,42 +61,65 @@ io.on('connection', socket => {
     })
     
     socket.on('moveSubmission', movesForRound => {
+        console.log(socket.id + " has sent submission for " + roundNumber);
+        if (!(roundNumber in movesOverRounds)) {
+            movesOverRounds[roundNumber] = {}
+        }
         movesOverRounds[roundNumber][socket.id] = movesForRound;
         if (Object.keys(movesOverRounds[roundNumber]).length == 2) {
             for (var user of users) {
-                userMoves = movesOverRounds[roundNumber][user.name]
+                var usersMoves = movesOverRounds[roundNumber][user.name]
 
-                creationArray = Object.keys(userMoves['playersCreated'])
-                creationArray.sort()
-                for (var newPlayerID of creationArray) {
-                    x = usersMoves['playersCreated'][newPlayerID].x
-                    y = usersMoves['playersCreated'][newPlayerID].y
-                    var newUserPlayer = new Player(user.name, x, y)
-                    gameBoard.map[x][y].playerList.push(newUserPlayer)
-                    if (newUserPlayer.id != newPlayerID) {
-                        console.log("Assertion Error")
+                if (usersMoves['playersCreated']) {
+                    for (var position of usersMoves['playersCreated']) {
+                        var x = position[0];
+                        var y = position[1]
+                        var newUserPlayer = new Player(user, x, y)
+                        gameBoard.map[x][y].playerList.push(newUserPlayer)
                     }
                 }
 
-                movementArray = Object.keys(userMoves['playerMovements'])
-                movementArray.sort()
-                for (var movementID of movementArrat) {
-                    x = usersMoves['playerMovements'][movementID][0]
-                    y = usersMoves['playerMovements'][movementID][1]
-                    for (var player of user.playerList) {
-                        if (player.id == movementID) {
-                            player.move_to(x, y, gameBoard)
+                if (usersMoves['playerMovements']) {
+                    var movementArray = Object.keys(usersMoves['playerMovements'])
+                    movementArray.sort()
+                    for (var movementID of movementArray) {
+                        var x = usersMoves['playerMovements'][movementID][0]
+                        var y = usersMoves['playerMovements'][movementID][1]
+                        for (var player of user.playerList) {
+                            if (player.id == movementID) {
+                                pastPos = player.move_to(x, y)
+                                gameBoard.map[x][y].playerList.push(player)
+                                var newPastPosList = []
+                                for (var oldPlayer of gameBoard.map[pastPos[0]][pastPos[1]].playerList) {
+                                    if (!(oldPlayer.id == player.id)) {
+                                        newPastPosList.push(oldPlayer)
+                                    }
+                                }
+                                gameBoard.map[pastPos[0]][pastPos[1]].playerList = newPastPosList;
+                            }
                         }
                     }
                 }
+
+                user.technology += usersMoves['techInvestment']['value']
+                user.iron -= usersMoves['techInvestment']['value']
             }
 
             for (var y=0; y<10; ++y) {
                 for (var x=0; x<10; ++x) {
-                    gameBoard.map[y][x].processEvent()
+                    gameBoard.map[y][x].processEvent(users[0], users[1])
                 }
             }
 
+            io.emit('refreshBoard', gameBoard, users);
+            for (var x = 0; x<10; ++x) {
+                for (var y=0; y<10; ++y) {
+                    if (gameBoard.map[y][x].playerList.length > 0) {
+                        console.log("Player found at " + x + " " + y);
+                    }
+                }
+            }
+            console.log("Result sent back for Round " + roundNumber);
             roundNumber += 1
         }
     })

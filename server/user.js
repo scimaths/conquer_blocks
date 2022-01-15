@@ -15,7 +15,7 @@ class User {
         this.properties = avatar_list[avatar];
         this.playerList = [];
         this.playersCreated = 0;
-        this.iron = 0;
+        this.iron = 2000;
         this.technology = 0;
         this.diamond = 0;
     }

@@ -6,14 +6,16 @@ class Player {
         this.x = x;
         this.y = y;
         this.health = 100;
+        this.properties = user.properties
         user.playerList.push(this);
     }
 
-    move_to(x, y, board) {
-        board.map[this.x, this.y].removePlayer(this.id);
+    move_to(x, y) {
+        var pastX = this.x;
+        var pastY = this.y;
         this.x = x;
         this.y = y;
-        board.map[x, y].playerList.push(this);
+        return [pastX, pastY];
     }
 }
 

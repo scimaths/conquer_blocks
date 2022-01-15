@@ -30,7 +30,7 @@ var lastSetTint;
 
 // Moves for each round, to be sent to server
 var thisRoundMoves = {
-	'playersCreated': {},
+	'playersCreated': [],
 	'playerMovements': {},
 	'techInvestment': {}
 }
@@ -97,15 +97,30 @@ socket.on('bothPlayersInfo', userInfo => {
 	bothPlayersReady = true;
 })
 
+// socket.on('transferAmount', amount =>{
+// 	const options = {type: "erc721",  
+//                  receiver: "0x..",
+//                  contractAddress: "0x..",
+//                  tokenId: 1}
+// 	let result = await Moralis.transfer(options)
+// })
+
 function submitMoves() {
+	console.log(thisRoundMoves)
 	thisRoundMoves['techInvestment'] = {
 		'value': Math.min(parseInt(document.getElementById('tech_investment').value), selfPlayer.iron),
 	}
 	socket.emit('moveSubmission', thisRoundMoves);
 	submitted.push(roundNumber);
-	thisRoundMoves = {};
+	thisRoundMoves = {
+		'playersCreated': [],
+		'playerMovements': {},
+		'techInvestment': {}
+	}
 	document.getElementById('tech_investment').value = 0;
 }
+
+document.getElementById('submitButton').addEventListener('click', submitMoves);
 
 async function create() {
 	scene = this;
@@ -119,14 +134,12 @@ async function create() {
 	this.input.on('gameobjectdown', (pointer, gameObject) => {
 		if (lastSetTint && (String(lastSetTint.name).length <= 3) && !moved_pieces.includes(String(lastSetTint.name))) {
 			if (gameObject.name.length == 9) {
-				console.log(gameObject.x)
-				console.log(lastSetTint.x)
 				var width = 70;
 				if(Math.round(Math.abs((gameObject.x-lastSetTint.x+10)/width))+Math.round(Math.abs((gameObject.y-lastSetTint.y-10)/width))==1){
 					lastSetTint.setPosition(gameObject.x-10,gameObject.y+10)
 					moved_pieces.push(String(lastSetTint.name))
 					// this.physics.moveTo(lastSetTint,gameObject.x,gameObject.y)
-					thisRoundMoves['playerMovements'][parseInt(lastSetTint.name)] = ((gameObject.x-40)/width, (gameObject.y-60)/width);
+					thisRoundMoves['playerMovements'][parseInt(lastSetTint.name)] = [(lastSetTint.x-40)/width, (lastSetTint.y-60)/width];
 				}
 			}
 		}
@@ -135,17 +148,14 @@ async function create() {
 		for(var i=0;i<10;i++)
 			for(var j=0;j<10;j++)
 				block_sprites[i][j].clearTint()
-		console.log(gameObject)
+
 		if(String(gameObject.name).length <=2){
 			player_selected = 1
 			lastSetTint = gameObject;
 			gameObject.setTint(0xff0000);
-			console.log(gameObject.name)
 			var width = 70;
 			var x_index = (gameObject.x-40)/width
 			var y_index = (gameObject.y-60)/width
-			console.log(gameObject.x + " " + gameObject.y)
-			console.log(x_index + " " + y_index)
 			try{ block_sprites[x_index+1][y_index].setTint(0xffff00) } catch{}
 			try{ block_sprites[x_index][y_index+1].setTint(0xffff00) } catch{}
 			try{ block_sprites[x_index-1][y_index].setTint(0xffff00) } catch{}
@@ -157,8 +167,7 @@ async function create() {
 				var xpos = parseInt(gameObject.name.substring(0, 1));
 				var ypos = parseInt(gameObject.name.substring(2, 3));
 				if (selfPlayer.iron >= selfPlayer.properties['iron_per_soldier']) {
-					var new_player = new Player(selfPlayer, xpos, ypos);
-					thisRoundMoves['playersCreated'][new_player.id] = new_player;
+					thisRoundMoves['playersCreated'].push([xpos, ypos]);
 					selfPlayer.iron -= selfPlayer.properties['iron_per_soldier'];
 					ironText.setText("Iron: " + String(selfPlayer.iron));
 				}
@@ -174,16 +183,15 @@ socket.on('gameBoardObject', gameBoardObject => {
 	for (let i = 0; i < gameBoard.width; i++) {
 		block_sprites[i]=new Array(10)
 		for (let j = 0; j < gameBoard.height; j++) {
-			//console.log(block_sprites)
-			let k = scene.physics.add.sprite(50 + width*i, 50 + width*j, gameBoard.map[i][j].name).setScale(width/512).setInteractive();
+			let k = scene.physics.add.sprite(50 + width*i, 50 + width*j, gameBoard.map[i][j].name).setScale(width/512).refreshBody().setInteractive();
 			k.setName(String(i) + " " + String(j) + " " + "block");
-			block_sprites[i][j]=k
+			block_sprites[i][j] = k
 		}
 	}
 	refreshBoard(gameBoardObject, selfPlayer);
 	
 	var d = new Date();
-	firstBoardTime = d.getTime();
+	previousTime = d.getTime();
 	
 	// Entering round 1
 	roundNumber += 1;
@@ -192,12 +200,11 @@ socket.on('gameBoardObject', gameBoardObject => {
 
 // Updating the frame
 async function update() {
-	d = new Date();
-	if (d.getTime() - previousTime >= 15000 && !submitted.includes(roundNumber)) {
+	var d = new Date();
+	if (d.getTime() - previousTime >= 450000 && !submitted.includes(roundNumber)) {
 		submitMoves();
 	}
 }
-// refreshBoard
 
 function refreshBoard (board, selfPlayerReceived) {
 	// first we destroy all the existing sprites on the board
@@ -208,6 +215,10 @@ function refreshBoard (board, selfPlayerReceived) {
 	ironText.setText("Iron: " + String(selfPlayer.iron))
 	diamondText.setText("Diamond: " + String(selfPlayer.diamond))
 
+	for (var sprite of spritesCurr) {
+		sprite.disableBody(true, true)
+	}
+
 	spritesCurr = []
 
 	var width = 70;
@@ -216,21 +227,22 @@ function refreshBoard (board, selfPlayerReceived) {
 		for (let x = 0; x < board.width; x++) {
 			// get the blocks
 			var block = board.map[x][y]
+
 			var players = block.playerList
 			var plusCreated = false;
 			for(var player of players){
 				if(player.name == selfPlayer.name){
-					let v = scene.physics.add.sprite(50 + width*x - 10, 50 + width*y + 10, 'currplayer').setScale(0.06).setInteractive();
+					let v = scene.physics.add.sprite(50 + width*x - 10, 50 + width*y + 10, 'currplayer').setScale(0.06).refreshBody().setInteractive();
 					v.setName(player.id)
 					spritesCurr.push(v);
 					if (!plusCreated) {
-						let pl = scene.physics.add.sprite(50 + width*x + 20, 50 + width*y - 20, 'plus').setScale(0.05).setInteractive();
+						let pl = scene.physics.add.sprite(50 + width*x + 20, 50 + width*y - 20, 'plus').setScale(0.05).refreshBody().setInteractive();
 						pl.setName(String(x) + " " + String(y) + " plus");
 						spritesCurr.push(pl);
 					}
 				}
 				else{
-					let v = scene.physics.add.sprite(50 + width*x + 10, 50 + width*y + 10, 'oppplayer').setScale(0.06).setInteractive();
+					let v = scene.physics.add.sprite(50 + width*x + 10, 50 + width*y + 10, 'oppplayer').setScale(0.06).refreshBody().setInteractive();
 					v.setName("Opponent");	
 					spritesCurr.push(v)
 				}	
@@ -239,8 +251,16 @@ function refreshBoard (board, selfPlayerReceived) {
 	}
 }
 
-socket.on('refreshBoard', (board, selfPlayerReceived) => {
+socket.on('refreshBoard', (board, users) => {
+	console.log("Result for Round " + roundNumber + " received")
+	var selfPlayerReceived;
+	for (var user of users) {
+		if (user.name == selfPlayer.name) {
+			selfPlayerReceived = user;
+		}
+	}
 	refreshBoard(board, selfPlayerReceived);
+	moved_pieces = [];
 	roundNumber += 1;
 	var d = new Date();
 	previousTime = d.getTime();
