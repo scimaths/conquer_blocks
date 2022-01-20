@@ -1,53 +1,15 @@
-DONE
-User A joins -> Server initializes user A, sends id
-User B joins -> Server initializes user B, sends id
+## Conquer Every Block
+In this 2-player arena game, each side has a king belonging to one of a few classes. </br>
+The king is symbolized by NFT-count.</br> 
+A random (symmetrical) map is generated at the start of each game and each block can belong to one of several classes 
+- Magma, Stone,... with varying amounts of resources 
+- Iron or Diamonds. 
+- Players choose where to move each soldier for 15 rounds and soldiers mine resources using technology while also challenging the opponent's soldiers if on the same block. The player with the most diamonds wins.
 
-Once both have joined, server sends dictionary of user objects
+### Inspiration
+We drew major inspiration from India's rich history of dynasties - kings after kings ruling major parts of the country, fighting or collaborating while developing. No war has ever been won without wit and that's what you are gonna need to win this game.
 
+### Screenshots
+<img src="https://user-images.githubusercontent.com/81357954/149632588-1eb23c37-891f-46cc-a5fb-accef85c73cf.jpeg" width="600" height="400">
 
-Akshat start this
-<!-- @akshat time loop how? -->
-@akshat right here okay
-
-
-After giving confirmation for all movements, iterate over all blocks, call block.process()
-
-Ashwin implementing
-Create board object, send to both users from server.
-
-
-
-Expected structure for movesForRound -
-
-movesForRound = {
-    'player1': {
-        'playersCreated': {
-            playerID: playerObject,
-            ...
-        },
-        'playerMovements': {
-            playerID: (x, y),
-            ...
-        },
-        'techInvestment': {
-            value: value,
-        }
-    },
-    'player2': {
-        ...
-    }
-}
-
-
-
-
-record time.time() after first refresh
-
-
-
-check in update if diff of time > 15 seconds or player clicks submit
-if yes, send movesForRound to server
-wait for output of server
-record time.time()
-check in update if diff of time > 15 seconds or player clicks submit
-...
+<img src="https://user-images.githubusercontent.com/81357954/149632541-e4db8200-e880-4e25-bb9e-380b4a38c504.jpeg" width="600" height="400">
