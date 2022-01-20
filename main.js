@@ -2,12 +2,14 @@ Moralis.initialize("1pEceBLaCdAkvuVU95UJyjxe4zSaM86efw7vNiFI");
 Moralis.serverURL = "https://uziynvgk9swe.usemoralis.com:2053/server";
 
 var game;
+var user;
 var userAddress;
 
 async function launch(){
 	// let user = Moralis.User.current();
-	var user = await Moralis.Web3.authenticate();
+	user = await Moralis.Web3.authenticate();
 	console.log(user);
+	socket.emit('userMetamask', String(user.get("ethAddress")));
 	if (!user) {
 	  console.log("PLEASE LOG IN WITH METAMASK!!")
 	  user = await Moralis.Web3.authenticate();
@@ -21,10 +23,10 @@ async function launch(){
 	}
 }
 
+const socket = io("127.0.0.1:8000");
+
 launch();
 
-
-const socket = io("127.0.0.1:8000");
 
 import { block_list, Block } from "./block.js";
 import { Board } from "./board.js";
@@ -96,7 +98,6 @@ var roundNumber = 0;
 
 var submitted = [];
 
-
 // Load assets - FIXED
 function preload() {
 	for (const [key, value] of Object.entries(block_list)) {
@@ -109,8 +110,8 @@ function preload() {
 	this.load.image('king2', 'assets/King2.jpg')
 }
 
-socket.on('userDetails', user => {
-	userNameSelf = user;
+socket.on('userDetails', username => {
+	userNameSelf = username;
 })
 
 socket.on('bothPlayersInfo', userInfo => {
@@ -127,7 +128,6 @@ socket.on('bothPlayersInfo', userInfo => {
 
 socket.on('gameOver', winner => {
 	if (selfPlayer.name == winner) {
-		getMoney();
 		alert('You Won! You got the winner token.')
 	}
 	else if (winner == "None") {
@@ -137,17 +137,6 @@ socket.on('gameOver', winner => {
 		alert('You lost! Try again :(')
 	}
 })
-
-async function getMoney() {
-	var tokenId = "28040310801717321937399299329414674345882600226629503214282924002391871193188";
-	const optionsa = {type: "erc1155",  
-                 receiver: userAddress,
-                 contractAddress: "0x2953399124F0cBB46d2CbACD8A89cF0599974963",
-                 tokenId: tokenId}
-	console.log(optionsa)
-	let resulta = await Moralis.transfer(optionsa)
-	console.log(resulta)
-}
 
 function submitMoves() {
 	console.log(thisRoundMoves)
