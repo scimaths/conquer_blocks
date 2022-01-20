@@ -36,7 +36,7 @@ io.on('connection', socket => {
         newUser = new User(String(socket.id), 'king2');    
     }
     users.push(newUser);
-    io.to(socket.id).emit('userDetails', socket.id)
+    io.to(socket.id).emit('userDetails', String(socket.id))
 
     if (users.length == 2) {
         gameBoard = new Board(10, 10);
@@ -59,7 +59,7 @@ io.on('connection', socket => {
         console.log(socket.id + " has left the game")
         cnt = 0;
         for (let user of users) {
-            if (socket.id == user.name) {
+            if (String(socket.id) == user.name) {
                 users.splice(cnt, 1);
                 break;
             }
@@ -72,7 +72,7 @@ io.on('connection', socket => {
         if (!(roundNumber in movesOverRounds)) {
             movesOverRounds[roundNumber] = {}
         }
-        movesOverRounds[roundNumber][socket.id] = movesForRound;
+        movesOverRounds[roundNumber][String(socket.id)] = movesForRound;
         if (Object.keys(movesOverRounds[roundNumber]).length == 2) {
             for (var user of users) {
                 var usersMoves = movesOverRounds[roundNumber][user.name]
@@ -98,7 +98,7 @@ io.on('connection', socket => {
                                 gameBoard.map[x][y].playerList.push(player)
                                 var newPastPosList = []
                                 for (var oldPlayer of gameBoard.map[pastPos[0]][pastPos[1]].playerList) {
-                                    if (!(oldPlayer.id == player.id)) {
+                                    if (!(oldPlayer.id == player.id && oldPlayer.name == player.name)) {
                                         newPastPosList.push(oldPlayer)
                                     }
                                 }
@@ -118,11 +118,11 @@ io.on('connection', socket => {
                 }
             }
 
-            io.emit('refreshBoard', gameBoard, users);
+            io.emit('refreshBoard', gameBoard, users, roundNumber);
             for (var x = 0; x<10; ++x) {
                 for (var y=0; y<10; ++y) {
                     if (gameBoard.map[y][x].playerList.length > 0) {
-                        console.log("Player found at " + x + " " + y);
+                        console.log(gameBoard.map[y][x].playerList.length + " players found at " + x + " " + y);
                     }
                 }
             }

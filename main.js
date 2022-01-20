@@ -156,12 +156,6 @@ function submitMoves() {
 	}
 	socket.emit('moveSubmission', thisRoundMoves);
 	submitted.push(roundNumber);
-	thisRoundMoves = {
-		'playersCreated': [],
-		'playerMovements': {},
-		'techInvestment': {}
-	}
-	document.getElementById('tech_investment').value = 0;
 }
 
 document.getElementById('submitButton').addEventListener('click', submitMoves);
@@ -174,7 +168,7 @@ async function create() {
 	ironText = this.add.text(800, 16, 'Iron: 0', { fontSize: '15px', fill: '#FFF' });
 	diamondText = this.add.text(800, 40, 'Diamond: 0', { fontSize: '15px', fill: '#FFF' });
 	techText = this.add.text(800, 64, 'Technology: 0', { fontSize: '15px', fill: '#FFF' })
-	roundText = this.add.text(800, 64, 'Round: 0', { fontSize: '15px', fill: '#FFF' })
+	roundText = this.add.text(800, 88, 'Round: 0', { fontSize: '15px', fill: '#FFF' })
 	var player_selected = 0
 	
 	this.input.on('gameobjectdown', (pointer, gameObject) => {
@@ -303,8 +297,14 @@ function refreshBoard (board, selfPlayerReceived) {
 	}
 }
 
-socket.on('refreshBoard', (board, users) => {
+socket.on('refreshBoard', (board, users, roundNumberRec) => {
 	console.log("Result for Round " + roundNumber + " received")
+	thisRoundMoves = {
+		'playersCreated': [],
+		'playerMovements': {},
+		'techInvestment': {}
+	}
+	document.getElementById('tech_investment').value = 0;
 	var selfPlayerReceived;
 	for (var user of users) {
 		if (user.name == selfPlayer.name) {
@@ -313,7 +313,7 @@ socket.on('refreshBoard', (board, users) => {
 	}
 	refreshBoard(board, selfPlayerReceived);
 	moved_pieces = [];
-	roundNumber += 1;
+	roundNumber = roundNumberRec;
 	roundText.setText("Round: " + String(roundNumber))
 	var d = new Date();
 	previousTime = d.getTime();
