@@ -1,39 +1,20 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
-    <script src="https://npmcdn.com/moralis@latest/dist/moralis.js"></script>
-    <script src="//cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.js"></script>
-  </head>
-  <body>
-    <script>
-        async function buyCharacter(price, bought) {
-            if (!bought) {
-                const optionsTransfer = {
-                    type: "erc1155",  
-                    receiver: "0x0aaa0e1924f417cd290868b2187f6d3310c63dc4",
-                    contractAddress: "0x2953399124F0cBB46d2CbACD8A89cF0599974963",
-                    tokenId: "4823589789184167491873069624913210034397340050026939612645948392196020371956",
-                    amount: price
-                }
-
-                userMoney = parseInt(document.getElementById("money").innerHTML.split(": ")[1])
-
-                if (price > userMoney){
-                    alert("Insufficient Tokens :(")
-                }
-                else{
-                    var transaction_moralis = await Moralis.transfer(optionsTransfer)
-                    var result_trans = await transaction_moralis.wait()
-                    console.log(result_trans)
-                }
-            }
-        }
-    </script>
+    <head>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+        <script src="https://npmcdn.com/moralis@latest/dist/moralis.js"></script>
+        <script src="//cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.js"></script>
+    </head>
+    <body>
+    <script type="module" src="./main.js"></script>
     <script src="https://cdn.socket.io/4.4.1/socket.io.min.js" integrity="sha384-fKnu0iswBIqkjxrhQCTZ7qlLHOFEgNkRmK2vaO/LbTZSXdJfAu6ewRBdwHPhBo/H" crossorigin="anonymous"></script>
+    <br>
     <div class="container">
-        <h2 id="username">User: </h2>
+        <div class="row">
+            <h2 class="col-lg-11" id="username">User: </h2>
+            <button id="logout" class = "col-lg-1 btn-danger btn">Log Out</button>
+        </div>
         <h2 id="money">Tokens: </h2>
     </div>
     <div class="container">
@@ -50,10 +31,57 @@
     <br>
     <div class="container">
         <center><button class="btn btn-success" id="navigate_game">Navigate to game with Chanakya</button>
-            <button class="btn btn-success" id="navigate_nft">Navigate to nft purchase</button></center>
+        <button class="btn btn-success" id="navigate_nft">Navigate to nft purchase</button></center>
     </div>
     <br>
     <br>
-    <script type="module" src="./main.js"></script>
+    <script>
+        Moralis.initialize("i4ksO2vybBAOY0kIx85vyi1w9XqHUOBTzHYL9svK");
+        Moralis.serverURL = "https://5rezrcp5nmxf.usemoralis.com:2053/server";
+        // Moralis.enableWeb3()
+        async function buyCharacter(price, bought, nameOfPlayerChosen) {
+            if (!bought) {
+                const optionsTransfer = {
+                    type: "erc1155",  
+                    receiver: "0x0aaa0e1924f417cd290868b2187f6d3310c63dc4",
+                    contractAddress: "0x2953399124F0cBB46d2CbACD8A89cF0599974963",
+                    tokenId: "4823589789184167491873069624913210034397340050026939612645948392196020371956",
+                    amount: price
+                }
+                userMoney = parseInt(document.getElementById("money").innerHTML.split(": ")[1])
+
+                if (price > userMoney){
+                    alert("Insufficient Tokens :(")
+                }
+                else {
+                    try {
+                        var transaction_moralis = await Moralis.transfer(optionsTransfer)
+                        var result_trans = await transaction_moralis.wait()
+                        console.log(result_trans)
+                        let user = Moralis.User.current();
+                        let avatarCollection = user.get("avatars")
+                        for (let index in avatarCollection) {
+                            if (avatarCollection[index]['price'] == price) {
+                                avatarCollection[index]['owned'] = true;
+                            }
+                        }
+                        user.set("avatars", avatarCollection);
+                        await user.save();
+                        location.reload();
+                    } catch(err) {
+                        alert("Please sign the transaction!")
+                        console.log(err)
+                    }
+                }
+            }
+            else {
+                var strNav = document.getElementById('navigate_game').innerHTML;
+                var strList = strNav.split(" ")
+                strList[strList.length-1] = nameOfPlayerChosen.charAt(0).toUpperCase() + nameOfPlayerChosen.slice(1);
+                document.getElementById('navigate_game').innerHTML = strList.join(" ")
+                console.log(document.getElementById('navigate_game').innerHTML)
+            }
+        }
+    </script>
 </body>
 </html>

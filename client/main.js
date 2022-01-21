@@ -1,5 +1,5 @@
-Moralis.initialize("7eWpbh0xsRKuUQNHJ8nhwWiMfomgP76NFM8rnsDZ");
-Moralis.serverURL = "https://accoohwmalee.usemoralis.com:2053/server";
+Moralis.initialize("i4ksO2vybBAOY0kIx85vyi1w9XqHUOBTzHYL9svK");
+Moralis.serverURL = "https://5rezrcp5nmxf.usemoralis.com:2053/server";
 
 var user;
 user = Moralis.User.current();
@@ -9,10 +9,17 @@ if (!user) {
 }
 console.log(user.get("ethAddress"));
 
+async function logout() {
+    await Moralis.User.logOut();
+    location.reload();
+}
+
 const socket = io("127.0.0.1:8000");
 const moneyHTML = document.getElementById("money")
 const usernameHTML = document.getElementById("username")
 const navigateHTML = document.getElementById("navigate_game")
+const logoutButton = document.getElementById("logout")
+logoutButton.onclick = logout
 
 const navigateNFT = document.getElementById("navigate_nft")
 
@@ -36,7 +43,7 @@ socket.on('moneyAvailable', money => {
 })
 
 function redirect() {
-    window.location.href = "game.html?play=" + chosen + "," + user.get("ethAddress");
+    window.location.href = "game.html?play=" + document.getElementById('navigate_game').innerHTML.split(" ").at(-1).toLowerCase();
 }
 
 navigateHTML.onclick = redirect
@@ -101,28 +108,6 @@ if(!user.get("avatars")){
     await user.save();
 }
 
-// curr_user_data.set("avatars",avatar_list)
-async function buyCharacter(price, bought) {
-    if (!bought) {
-        const optionsTransfer = {
-            type: "erc1155",  
-            receiver: "0x0aaa0e1924f417cd290868b2187f6d3310c63dc4",
-            contractAddress: "0x2953399124F0cBB46d2CbACD8A89cF0599974963",
-            tokenId: "4823589789184167491873069624913210034397340050026939612645948392196020371956",
-            amount: price
-        }
-        console.log(userMoney)
-        if (price > userMoney){
-            alert("Insufficient Tokens :(")
-        }
-        else{
-            var transaction_moralis = await Moralis.transfer(optionsTransfer)
-            var result_trans = await transaction_moralis.wait()
-            console.log(result_trans)
-        }
-    }
-}
-
 function component(name, iron_mining, diamond_mining, damage, iron_soldier, bought, price) {
     var value = "";
     if (bought) {
@@ -148,7 +133,7 @@ function component(name, iron_mining, diamond_mining, damage, iron_soldier, boug
                     </center>
                 </div>
                 <div class="card-footer">
-                    <center><button id="${name}_button" class="btn btn-primary" onclick="buyCharacter(${price}, ${bought})">${value}</button></center>
+                    <center><button id="${name}_button" class="btn btn-primary" onclick="buyCharacter(${price}, ${bought}, '${name}')">${value}</button></center>
                 </div>
             </div>`
 }
@@ -158,7 +143,7 @@ function create_avatar_dict(){
     var owned_tags= document.getElementById("001");
     var store_tags = document.getElementById("002")
     var userAvatars = user.get("avatars")
-    let buttonArray = []
+
     for (let avatarIndex in userAvatars) {
         let avatar = userAvatars[avatarIndex]
         if(avatar['owned']){
