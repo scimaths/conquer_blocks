@@ -2,17 +2,37 @@ Moralis.initialize("1pEceBLaCdAkvuVU95UJyjxe4zSaM86efw7vNiFI");
 Moralis.serverURL = "https://uziynvgk9swe.usemoralis.com:2053/server";
 
 var game;
-var user;
-var userAddress;
+var user = Moralis.User.current();
+if (!user) {
+	user = await Moralis.Web3.authenticate();
+}
 
-var loc = window.location.href.split('=')[1];
-console.log(loc);
+var userAddress;
+var playerChosen;
+
+var loc = window.location.href.split('=');
+if (loc.length == 1) {
+	playerChosen = "chanakya";
+}
+else {
+	playerChosen = loc[1];
+	valid = false;
+	avatarList = user.get("avatars")
+	avatarList.forEarch(avatar => {
+		if (avatar['name'] == playerChosen && avatar['owned']) {
+			valid = true;
+		}
+	})
+	if (!valid) {
+		playerChosen = "chanakya"
+	}
+}
 
 async function launch(){
 	// let user = Moralis.User.current();
 	user = await Moralis.Web3.authenticate();
 	console.log(user);
-	socket.emit('userMetamask', String(user.get("ethAddress")));
+	socket.emit('userMetamask', [String(user.get("ethAddress")), playerChosen]);
 	if (!user) {
 	  console.log("PLEASE LOG IN WITH METAMASK!!")
 	  user = await Moralis.Web3.authenticate();

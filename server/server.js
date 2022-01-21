@@ -35,7 +35,7 @@ const ownerAddress = '0x0aaa0e1924f417cd290868b2187f6d3310c63dc4'
 const privateKey = '3cc7e2c40ecff7dd649f1435498c39af05197b78ae18a69e74631be8f013eec6';         //The private key of your contract Owner  
 const tokenid = "4823589789184167491873069624913210034397340050026939612645948392196020371956"
 const amount = 5
-//Creating Web3 Objct
+//Creating Web3 Object
 const web3js = new Web3(new Web3.providers.HttpProvider("https://speedy-nodes-nyc.moralis.io/84a8c779ccfdca1a1f4d31d7/polygon/mumbai"));
 
 //creating Contract Object
@@ -63,19 +63,39 @@ async function sendMoney(winner) {
     })
 }
 
+
+async function getMoney(purchaser) {
+    
+    const toAddress = purchaser; //The address to transfer the tokens    
+
+    var data = contract.methods.safeTransferFrom(toAddress, ownerAddress, tokenid, amount ,[]).encodeABI(); //Create the data for token transaction.
+
+    var rawTransaction = { "to": contractAddress, "gas": 100000, "data": data };
+
+    web3js.eth.accounts.signTransaction(rawTransaction, privateKey)
+        .then(signedTx => web3js.eth.sendSignedTransaction(signedTx.rawTransaction))
+        .then(req => {
+            /* The trx was done. Write your acctions here. For example getBalance */
+            getTOKENBalanceOf(toAddress).then(balance => { console.log(toAddress + " Token Balance: " + balance); });
+            return true;
+    })
+}
+
 io.on('connection', socket => {
     socket.on('landingPage', ethAddress => {
         getTOKENBalanceOf(ethAddress).then(balance => { io.to(socket.id).emit('moneyAvailable', balance); });
     })
 
-    socket.on('userMetamask', username => {
+    socket.on('userMetamask', userSent => {
+        username = userSent[0]
+        userPlayer = userSent[1]
         console.log(String(socket.id) + " has username " + username)
         socketMetamask[String(socket.id)] = username;
         if (users.length == 0) {
-            newUser = new User(String(username), 'king1');
+            newUser = new User(String(username), userPlayer);
         }
         else {
-            newUser = new User(String(username), 'king2');    
+            newUser = new User(String(username), userPlayer);    
         }
         users.push(newUser);
         io.to(socket.id).emit('userDetails', socketMetamask[String(socket.id)])
