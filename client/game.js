@@ -5,6 +5,9 @@ var game;
 var user;
 var userAddress;
 
+var loc = window.location.href.split('=')[1];
+console.log(loc);
+
 async function launch(){
 	// let user = Moralis.User.current();
 	user = await Moralis.Web3.authenticate();
@@ -27,11 +30,32 @@ const socket = io("127.0.0.1:8000");
 
 launch();
 
-
-import { block_list, Block } from "./block.js";
-import { Board } from "./board.js";
-import { Player } from "./player.js";
-import { User } from "./user.js";
+let block_list = {
+    'magma': {
+        image: 'assets/Blocks/Rust.jpg',
+        danger: 70,
+        iron: 4000,
+        diamond: 400
+    },
+    'grass': {
+        image: 'assets/Blocks/Grass.jpg',
+        danger: 5,
+        iron: 1000,
+        diamond: 40
+    },
+    'medieval': {
+        image: 'assets/Blocks/Destroyed.jpg',
+        danger: 10,
+        iron: 3000,
+        diamond: 200
+    },
+    'stone': {
+        image: 'assets/Blocks/Yellow_brick.jpg',
+        danger: 10,
+        iron: 2000,
+        diamond: 100
+    }
+};
 
 var config = {
 	type: Phaser.AUTO,

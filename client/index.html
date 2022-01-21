@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+    <script src="https://npmcdn.com/moralis@latest/dist/moralis.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.js"></script>
+  </head>
+  <body>
+    <script src="https://cdn.socket.io/4.4.1/socket.io.min.js" integrity="sha384-fKnu0iswBIqkjxrhQCTZ7qlLHOFEgNkRmK2vaO/LbTZSXdJfAu6ewRBdwHPhBo/H" crossorigin="anonymous"></script>
+    <script type="module" src="./main.js"></script>
+    <div class="container">
+        <h2 id="username">User: </h2>
+        <h2 id="money">Tokens: </h2>
+    </div>
+    <div class="container">
+        <center><h2>You Own:</h2></center>
+        <div class="row">
+            <div class="col-md-3 col-lg-3 col-sm-12">
+                <div class="card">
+                    <div class="card-img">
+                    <img width="300" height="300" src="assets/chanakya.png" class="img-fluid">
+                    </div>
+                    <div class="card-body">
+                    <h4 class="card-title text-center">Chanakya</h4>
+                    <center>
+                    <p class="card-text">
+                        Iron Mining Rate: 400 <br>
+                        Diamond Mining Rate: 40 <br>
+                        Damage dealt: 10 <br>
+                        Iron for soldier: 1000 <br>
+                    </p>
+                    </center>
+                    </div>
+                    <div class="card-footer">
+                        <center><button id="chanakya" class="btn btn-primary">Choose</button></center>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <center><h2>Buy:</h2></center>
+        <div class="row">
+            <div class="col-md-3 col-lg-3 col-sm-12">
+                <div class="card">
+                    <div class="card-img">
+                    <img width="300" height="300" src="assets/ashoka.png" class="img-fluid">
+                    </div>
+                    <div class="card-body">
+                    <h4 class="card-title text-center">Ashoka</h4>
+                    <center>
+                    <p class="card-text">
+                        Iron Mining Rate: 400 <br>
+                        Diamond Mining Rate: 40 <br>
+                        Damage dealt: 10 <br>
+                        Iron for soldier: 1000 <br>
+                    </p>
+                    </center>
+                    </div>
+                    <div class="card-footer">
+                        <center><button id="ashoka" class="btn btn-primary">Pay 40 tokens</button></center>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-lg-3 col-sm-12">
+                <div class="card">
+                    <div class="card-img">
+                        <img width="300" height="300" src="assets/akbar.png" class="img-fluid">
+                    </div>
+                    <div class="card-body">
+                        <h4 class="card-title text-center">Akbar</h4>
+                        <center>
+                            <p class="card-text">
+                                Iron Mining Rate: 400 <br>
+                                Diamond Mining Rate: 40 <br>
+                                Damage dealt: 10 <br>
+                                Iron for soldier: 1000 <br>
+                            </p>
+                    </center>
+                </div>
+                <div class="card-footer">
+                    <center><button id="akbar" class="btn btn-primary">Pay 100 tokens</button></center>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-lg-3 col-sm-12">
+            <div class="card">
+                <div class="card-img">
+                    <img width="300" height="300" src="assets/rana_pratap.png" class="img-fluid">
+                </div>
+                <div class="card-body">
+                    <h4 class="card-title text-center">Maharana Pratap</h4>
+                    <center>
+                        <p class="card-text">
+                            Iron Mining Rate: 400 <br>
+                            Diamond Mining Rate: 40 <br>
+                            Damage dealt: 10 <br>
+                            Iron for soldier: 1000 <br>
+                        </p>
+                    </center>
+                </div>
+                <div class="card-footer">
+                    <center><button id="rana_pratap" class="btn btn-primary">Pay 200 tokens</button></center>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-lg-3 col-sm-12">
+                <div class="card">
+                    <div class="card-img">
+                        <img width="300" height="300" src="assets/laxmibai.png" class="img-fluid">
+                    </div>
+                    <div class="card-body">
+                        <h4 class="card-title text-center">Laxmibai</h4>
+                        <center>
+                            <p class="card-text">
+                                Iron Mining Rate: 400 <br>
+                                Diamond Mining Rate: 40 <br>
+                                Damage dealt: 10 <br>
+                                Iron for soldier: 1000 <br>
+                            </p>
+                        </center>
+                    </div>
+                    <div class="card-footer">
+                        <center><button id="laxmibai" class="btn btn-primary">Pay 400 tokens</button></center>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+    <br>
+    <br>
+    <div class="container">
+        <center><button class="btn btn-success" id="navigate_game">Navigate to game with Chanakya</button></center>
+    </div>
+    <br>
+    <br>
+</body>
+</html>

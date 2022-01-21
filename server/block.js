@@ -136,16 +136,16 @@ class Block {
             if (!(player.name in ironDivision)) {
                 ironDivision[player.name] = 0;
             }
-            ironDivision[player.name] += player.properties['hardwork'];
-            ironSum += player.properties['hardwork'];
+            ironDivision[player.name] += player.properties['hardwork_iron'];
+            ironSum += player.properties['hardwork_iron'];
             
             // Check user diamond need and sum
             if (thisPlayerUser.technology > 1000) {
                 if (!(player.name in diamondDivision)) {
                     diamondDivision[player.name] = 0;
                 }
-                diamondDivision[player.name] += player.properties['hardwork'] / 10;
-                diamondSum += player.properties['hardwork'] / 10;
+                diamondDivision[player.name] += player.properties['hardwork_diamond'];
+                diamondSum += player.properties['hardwork_diamond'];
             }
         }
 

@@ -1,20 +1,39 @@
 let avatar_list = {
-    'king1': {
-        'growth-rate': 3,
-        'hardwork': 400,
-        'storage': 40000,
+    'chanakya': {
+        'hardwork_iron': 400,
+        'hardwork_diamond': 40,
         'war-strength': 10,
         'iron_per_soldier': 1000,
-        'image': 'assets/King1.png'
+        'image': 'assets/chanakya.png'
     },
-    'king2': {
-        'growth-rate': 3,
-        'hardwork': 400,
-        'storage': 40000,
+    'ashoka': {
+        'hardwork_iron': 400,
+        'hardwork_diamond': 40,
         'war-strength': 10,
         'iron_per_soldier': 1000,
-        'image': 'assets/King2.jpg'
-    }
+        'image': 'assets/ashoka.png'
+    },
+    'laxmibai': {
+        'hardwork_iron': 400,
+        'hardwork_diamond': 40,
+        'war-strength': 10,
+        'iron_per_soldier': 1000,
+        'image': 'assets/laxmibai.png'
+    },
+    'rana_pratap': {
+        'hardwork_iron': 400,
+        'hardwork_diamond': 40,
+        'war-strength': 10,
+        'iron_per_soldier': 1000,
+        'image': 'assets/rana_pratap.png'
+    },
+    'akbar': {
+        'hardwork_iron': 400,
+        'hardwork_diamond': 40,
+        'war-strength': 10,
+        'iron_per_soldier': 1000,
+        'image': 'assets/akbar.png'
+    },
 };
 
 class User {
