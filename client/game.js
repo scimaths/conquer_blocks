@@ -62,6 +62,8 @@ let block_list = {
 };
 
 var config = {
+	parent: 'mygame',
+	autoCenter: Phaser.Scale.CENTER_BOTH,
 	type: Phaser.AUTO,
 	height: 720,
 	width: 960,

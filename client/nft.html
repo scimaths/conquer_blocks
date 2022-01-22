@@ -19,9 +19,12 @@
     ></script>
     <script type="module" src="./nft.js"></script>
     <div class="container">
-      <h2 id="username">User:</h2>
-      <h2 id="money">Tokens:</h2>
-    </div>
+      <div class="row">
+          <h2 class="col-lg-11" id="username">User: </h2>
+          <button id="logout" class = "col-lg-1 btn-danger btn">Log Out</button>
+      </div>
+  </div>
+  <div class="container">
     <div class="form-group">
       <div class="input-group mb-3">
         <input
@@ -31,114 +34,71 @@
           placeholder="NFT Name"
           aria-label="URL"
           aria-describedby="basic-addon1"
+          required
         />
       </div>
       <div class="input-group mb-3">
         <input
-          id="description"
-          type="text"
+          id="Iron_Mining"
+          type="number"
           class="form-control"
-          placeholder="Description"
+          placeholder="Iron_Mining"
           aria-label="URL"
           aria-describedby="basic-addon1"
+          required
+        />
+
+      </div>
+      <div class="input-group mb-3">
+        <input
+          id="Diamond_mining"
+          type="number"
+          class="form-control"
+          placeholder="Diamond_mining"
+          aria-label="URL"
+          aria-describedby="basic-addon1"
+          required
         />
       </div>
       <div class="input-group mb-3">
-        <input type="file" id="file" />
+        <input
+          id="Iron_per_soldier"
+          type="number"
+          class="form-control"
+          placeholder="Iron_per_soldier"
+          aria-label="URL"
+          aria-describedby="basic-addon1"
+          required
+        />
+      </div>
+      
+      <div class="input-group mb-3">
+        <input
+          id="damage"
+          type="number"
+          class="form-control"
+          placeholder="damage"
+          aria-label="URL"
+          aria-describedby="basic-addon1"
+          required
+        />
+      </div>
+      <div class="input-group mb-3">
+        <input type="file" id="file" value="avatar" required></input>
       </div>
     </div>
     <br />
     <div>
-      <button class="btn btn-primary" id="upload" onclick="upload();">
+      <button class="btn btn-primary" id="upload">
         Upload and Mint
       </button>
     </div>
+  </div>
+
     <br />
     <br />
     <div>
       <p id="resultSpace"></p>
     </div>
-  <script>
-    Moralis.initialize("i4ksO2vybBAOY0kIx85vyi1w9XqHUOBTzHYL9svK");
-    Moralis.serverURL = "https://5rezrcp5nmxf.usemoralis.com:2053/server";
-
-    var user;
-    user = Moralis.User.current();
-    if (!user) {
-      user = Moralis.Web3.authenticate();
-    }
-    const moneyHTML = document.getElementById("money");
-    const usernameHTML = document.getElementById("username");
-    usernameHTML.innerHTML = "User: " + user.get("ethAddress");
-    const nft_contract_address = "0x351bbee7C6E9268A1BF741B098448477E08A0a53";
-
-    console.log(user.get("ethAddress"));
-
-    async function upload() {
-      const fileInput = document.getElementById("file");
-      const data = fileInput.files[0];
-
-      const imageFile = new Moralis.File(data.name, data);
-
-      document.getElementById("upload").setAttribute("disabled", null);
-      document.getElementById("file").setAttribute("disabled", null);
-      document.getElementById("name").setAttribute("disabled", null);
-      document.getElementById("description").setAttribute("disabled", null);
-      console.log("ieeff")
-      await imageFile.saveIPFS();
-      const imageURI = imageFile.ipfs();
-      const metadata = {
-        name: document.getElementById("name").value,
-        description: document.getElementById("description").value,
-        image: imageURI,
-      };
-      const metadataFile = new Moralis.File("metadata.json", {
-        base64: btoa(JSON.stringify(metadata)),
-      });
-      console.log("ifps")
-      await metadataFile.saveIPFS();
-      const metadataURI = metadataFile.ipfs();
-
-      console.log("uploaded")
-      const txt = await mintToken(metadataURI).then(notify);
-
-      
-    }
-
-    async function mintToken(_uri) {
-      const encodedFunction = Moralis.Web3.eth.abi.encodeFunctionCall(
-        {
-          name: "mintToken",
-          type: "function",
-          inputs: [
-            {
-              type: "string",
-              name: "tokenURI",
-            },
-          ],
-        },
-        [_uri]
-      );
-
-      const transactionParameters = {
-        to: nft_contract_address,
-        from: user.get("ethAddress"),
-        data: encodedFunction,
-      
-      };
-
-      const txt = await ethereum.request({
-        method: "eth_sendTransaction",
-        params: [transactionParameters],
-      });
-      return txt;
-    }
-
-    async function notify(_txt) {
-      document.getElementById(
-        "resultSpace"
-      ).innerHTML = `<input disabled = "true" id="result" type="text" class="form-control" placeholder="Description" aria-label="URL" aria-describedby="basic-addon1" value="Your NFT was minted in transaction ${_txt}">`;
-    }
-  </script>
   </body>
 </html>

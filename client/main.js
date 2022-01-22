@@ -54,41 +54,41 @@ console.log(user.get("avatars"))
 let avatar_list = [
     {   'name':'chanakya',
         'iron_mining': 400,
-        'diamond_mining': 40,
+        'diamond_mining': 20,
         'damage': 10,
-        'iron_per_soldier': 1000,
+        'iron_per_soldier': 600,
         'price': 0,
         'owned': true,
     },
     {   'name':'ashoka',
-        'iron_mining': 400,
-        'diamond_mining': 40,
-        'damage': 10,
-        'iron_per_soldier': 1000,
+        'iron_mining': 500,
+        'diamond_mining': 30,
+        'damage': 20,
+        'iron_per_soldier': 800,
         'price': 40,
         'owned': false,
     },
     {   'name':'akbar',
-        'iron_mining': 400,
+        'iron_mining': 550,
         'diamond_mining': 40,
-        'damage': 10,
-        'iron_per_soldier': 1000,
+        'damage': 40,
+        'iron_per_soldier': 900,
         'price': 100,
         'owned': false,
     },
     {   'name':'rana_pratap',
-        'iron_mining': 400,
+        'iron_mining': 600,
         'diamond_mining': 40,
-        'damage': 10,
+        'damage': 30,
         'iron_per_soldier': 1000,
         'price': 200,
         'owned': false,
     },
     {   'name':'laxmibai',
-        'iron_mining': 400,
+        'iron_mining': 700,
         'diamond_mining': 40,
-        'damage': 10,
-        'iron_per_soldier': 1000,
+        'damage': 50,
+        'iron_per_soldier': 1100,
         'price': 500,
         'owned': false,
     },
@@ -108,18 +108,26 @@ if(!user.get("avatars")){
     await user.save();
 }
 
-function component(name, iron_mining, diamond_mining, damage, iron_soldier, bought, price) {
+function component(name, iron_mining, diamond_mining, damage, iron_soldier, bought, price,imageuri) {
     var value = "";
+    var image;
+    if(!imageuri)
+        image = `<img width="300" height="300" src="assets/${name}.png" class="img-fluid">`
+    else
+        image = `<img width="300" height="300" src="${imageuri}" class="img-fluid">`
+        
     if (bought) {
         value = "Choose"
     }
     else {
         value = `Pay ${price} tokens`
     }
+
+    
     return `<div class="col-md-3 col-lg-3 col-sm-12">
                 <div class="card bg-secondary" id="${name}_card">
                     <div class="card-img">
-                        <img width="300" height="300" src="assets/${name}.png" class="img-fluid">
+                        ${image}
                     </div>
                     <div class="card-body">
                         <h4 class="card-title text-center">${name.at(0).toUpperCase() + name.slice(1)}</h4>
@@ -147,11 +155,11 @@ function create_avatar_dict(){
     for (let avatarIndex in userAvatars) {
         let avatar = userAvatars[avatarIndex]
         if(avatar['owned']){
-            owned_tags.innerHTML =  owned_tags.innerHTML + component(avatar['name'], avatar['iron_mining'], avatar['diamond_mining'], avatar['damage'], avatar['iron_per_soldier'], avatar['owned'], avatar['price'])
+            owned_tags.innerHTML =  owned_tags.innerHTML + component(avatar['name'], avatar['iron_mining'], avatar['diamond_mining'], avatar['damage'], avatar['iron_per_soldier'], avatar['owned'], avatar['price'], avatar['imageuri'])
             // let button = document.getElementById(`${avatar['name']}_button`)
         }
         else{
-            store_tags.innerHTML =  store_tags.innerHTML + component(avatar['name'], avatar['iron_mining'], avatar['diamond_mining'], avatar['damage'], avatar['iron_per_soldier'], avatar['owned'], avatar['price'])
+            store_tags.innerHTML =  store_tags.innerHTML + component(avatar['name'], avatar['iron_mining'], avatar['diamond_mining'], avatar['damage'], avatar['iron_per_soldier'], avatar['owned'], avatar['price'], avatar['imageuri'])
         }
     };
     document.getElementById("chanakya_card").className = "card bg-success"

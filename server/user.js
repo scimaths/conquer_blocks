@@ -1,38 +1,38 @@
 let avatar_list = {
     'chanakya': {
         'hardwork_iron': 400,
-        'hardwork_diamond': 40,
+        'hardwork_diamond': 20,
         'war-strength': 10,
-        'iron_per_soldier': 1000,
+        'iron_per_soldier': 600,
         'image': 'assets/chanakya.png'
     },
     'ashoka': {
-        'hardwork_iron': 400,
-        'hardwork_diamond': 40,
-        'war-strength': 10,
-        'iron_per_soldier': 1000,
+        'hardwork_iron': 500,
+        'hardwork_diamond': 30,
+        'war-strength': 20,
+        'iron_per_soldier': 800,
         'image': 'assets/ashoka.png'
     },
-    'laxmibai': {
-        'hardwork_iron': 400,
+    'akbar': {
+        'hardwork_iron': 550,
         'hardwork_diamond': 40,
-        'war-strength': 10,
-        'iron_per_soldier': 1000,
-        'image': 'assets/laxmibai.png'
+        'war-strength': 40,
+        'iron_per_soldier': 900,
+        'image': 'assets/akbar.png'
     },
     'rana_pratap': {
-        'hardwork_iron': 400,
+        'hardwork_iron': 600,
         'hardwork_diamond': 40,
-        'war-strength': 10,
+        'war-strength': 30,
         'iron_per_soldier': 1000,
         'image': 'assets/rana_pratap.png'
     },
-    'akbar': {
-        'hardwork_iron': 400,
+    'laxmibai': {
+        'hardwork_iron': 700,
         'hardwork_diamond': 40,
-        'war-strength': 10,
-        'iron_per_soldier': 1000,
-        'image': 'assets/akbar.png'
+        'war-strength': 50,
+        'iron_per_soldier': 1100,
+        'image': 'assets/laxmibai.png'
     },
 };
 
