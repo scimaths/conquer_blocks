@@ -106,7 +106,7 @@
     }
 
     async function mintToken(_uri) {
-      const encodedFunction = web3.eth.abi.encodeFunctionCall(
+      const encodedFunction = Moralis.Web3.eth.abi.encodeFunctionCall(
         {
           name: "mintToken",
           type: "function",
