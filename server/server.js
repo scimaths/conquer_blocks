@@ -13,7 +13,7 @@ const server = http.createServer(app)
 
 const io = socketio(server, {
     cors : {
-        origin : "http://127.0.0.1:5501",
+        origin : "http://127.0.0.1:5500",
         methods : ["GET", "POST"],
     }
 })

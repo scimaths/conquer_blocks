@@ -120,7 +120,8 @@ var block_sprites = new Array(10);
 
 // Textboxes to show resources
 var ironText, diamondText, techText, roundText;
-
+var healthText;
+var currentHealthTextSet;
 
 // Time Variables
 var previousTime;
@@ -184,10 +185,11 @@ function create() {
 	socket.emit('ready', 'XYZ');
 	var width = 70;
 	
-	ironText = this.add.text(800, 16, 'Iron: 0', { fontSize: '15px', fill: '#FFF' });
-	diamondText = this.add.text(800, 40, 'Diamond: 0', { fontSize: '15px', fill: '#FFF' });
-	techText = this.add.text(800, 64, 'Technology: 0', { fontSize: '15px', fill: '#FFF' })
-	roundText = this.add.text(800, 88, 'Round: 0', { fontSize: '15px', fill: '#FFF' })
+	ironText = this.add.text(740, 16, 'Iron: 0', { fontSize: '15px', fill: '#FFF' });
+	diamondText = this.add.text(740, 40, 'Diamond: 0', { fontSize: '15px', fill: '#FFF' });
+	techText = this.add.text(740, 64, 'Technology: 0', { fontSize: '15px', fill: '#FFF' })
+	roundText = this.add.text(740, 88, 'Round: 0', { fontSize: '15px', fill: '#FFF' })
+	healthText = this.add.text(740, 130, 'Players: 0', { fontSize: '15px', fill: '#FFF' })
 	var player_selected = 0
 	
 	this.input.on('gameobjectdown', (pointer, gameObject) => {
@@ -232,6 +234,40 @@ function create() {
 					techText.setText("Technology: " + String(selfPlayer.technology));
 					roundText.setText("Round: " + String(roundNumber));
 				}
+			}
+		}
+	})
+	this.input.on('gameobjectover', (pointer, gameObject) => {
+		if (gameObject.name.length == 9 && gameObject.name.substring(4, 9) == "block") {
+			var xpos = (gameObject.x-50)/width;
+			var ypos = (gameObject.y-50)/width;
+			if (currentHealthTextSet && currentHealthTextSet == [xpos, ypos]) {
+				
+			}
+			else {
+				currentHealthTextSet = [xpos, ypos]
+				var stringText = "Your players: "
+				var stringHealths = ""
+				var countOver = 0;
+				var blockOver = gameBoard.map[xpos][ypos]
+				for (var playerOver of blockOver.playerList) {
+					if (playerOver.name == selfPlayer.name) {
+						countOver += 1
+						if (!stringHealths) {
+							stringHealths = String(playerOver.health)
+						}
+						else {
+							stringHealths += ", " + playerOver.health
+						}
+					}
+				}
+				if (countOver == 0) {
+					stringText += "0"
+				}
+				else {
+					stringText += countOver + "\nHealth: " + stringHealths;
+				}
+				healthText.setText(stringText)
 			}
 		}
 	})
