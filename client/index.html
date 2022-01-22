@@ -38,7 +38,8 @@
     <script>
         Moralis.initialize("i4ksO2vybBAOY0kIx85vyi1w9XqHUOBTzHYL9svK");
         Moralis.serverURL = "https://5rezrcp5nmxf.usemoralis.com:2053/server";
-        // Moralis.enableWeb3()
+        Moralis.enableWeb3()
+        var lastNameChosen = "chanakya"
         async function buyCharacter(price, bought, nameOfPlayerChosen) {
             if (!bought) {
                 const optionsTransfer = {
@@ -76,10 +77,14 @@
             }
             else {
                 var strNav = document.getElementById('navigate_game').innerHTML;
+                document.getElementById(nameOfPlayerChosen + "_card").className = "card bg-success"
+                if (lastNameChosen != nameOfPlayerChosen) {
+                    document.getElementById(lastNameChosen + "_card").className = "card bg-secondary"
+                }
                 var strList = strNav.split(" ")
                 strList[strList.length-1] = nameOfPlayerChosen.charAt(0).toUpperCase() + nameOfPlayerChosen.slice(1);
                 document.getElementById('navigate_game').innerHTML = strList.join(" ")
-                console.log(document.getElementById('navigate_game').innerHTML)
+                lastNameChosen = nameOfPlayerChosen;
             }
         }
     </script>

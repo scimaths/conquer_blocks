@@ -165,6 +165,7 @@ socket.on('gameOver', winner => {
 	else {
 		alert('You lost! Try again :(')
 	}
+	window.location.href = "index.html"
 })
 
 function submitMoves() {

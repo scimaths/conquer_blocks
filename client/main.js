@@ -117,7 +117,7 @@ function component(name, iron_mining, diamond_mining, damage, iron_soldier, boug
         value = `Pay ${price} tokens`
     }
     return `<div class="col-md-3 col-lg-3 col-sm-12">
-                <div class="card">
+                <div class="card bg-secondary" id="${name}_card">
                     <div class="card-img">
                         <img width="300" height="300" src="assets/${name}.png" class="img-fluid">
                     </div>
@@ -154,6 +154,7 @@ function create_avatar_dict(){
             store_tags.innerHTML =  store_tags.innerHTML + component(avatar['name'], avatar['iron_mining'], avatar['diamond_mining'], avatar['damage'], avatar['iron_per_soldier'], avatar['owned'], avatar['price'])
         }
     };
+    document.getElementById("chanakya_card").className = "card bg-success"
 }
 
 create_avatar_dict()

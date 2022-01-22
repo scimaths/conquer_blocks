@@ -40,7 +40,7 @@ const web3js = new Web3(new Web3.providers.HttpProvider("https://speedy-nodes-ny
 
 //creating Contract Object
 var contract = new web3js.eth.Contract(contractABI, contractAddress, { from: ownerAddress });
-const value =5;
+const value = 5;
 
 async function getTOKENBalanceOf(address) {
     return await contract.methods.balanceOf(address,tokenid).call();
@@ -202,9 +202,8 @@ io.on('connection', socket => {
                 else {
                     winner = "None";
                 }
-                io.emit('gameOver', winner);
-                
                 sendMoney(winner);
+                io.emit('gameOver', winner);
             }
             roundNumber += 1
         }
