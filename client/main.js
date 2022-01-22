@@ -122,7 +122,7 @@ function component(name, iron_mining, diamond_mining, damage, iron_soldier, boug
                         <img width="300" height="300" src="assets/${name}.png" class="img-fluid">
                     </div>
                     <div class="card-body">
-                        <h4 class="card-title text-center">${name}</h4>
+                        <h4 class="card-title text-center">${name.at(0).toUpperCase() + name.slice(1)}</h4>
                         <center>
                             <p class="card-text">
                                 Iron Mining Rate: ${iron_mining} <br>
