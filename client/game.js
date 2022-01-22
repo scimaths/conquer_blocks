@@ -18,8 +18,6 @@ else {
 	playerChosen = loc[1];
 	var valid = false;
 	var avatarList = user.get("avatars")
-	console.log(user)
-	console.log(avatarList)
 	for (var avatar of avatarList) {
 		if (avatar['name'] == playerChosen && avatar['owned']) {
 			valid = true;
@@ -30,46 +28,33 @@ else {
 	}
 }
 
-async function launch(){
-	socket.emit('userMetamask', [String(user.get("ethAddress")), playerChosen]);
-	if (!user) {
-	  console.log("PLEASE LOG IN WITH METAMASK!!")
-	  user = await Moralis.Web3.authenticate();
-	  userAddress = user.get("ethAddress") 
-	  game = new Phaser.Game(config);
-	}
-	else{
-	  console.log(user.get("ethAddress") + " " + "logged in")
-	  userAddress = user.get("ethAddress")  
-	  game = new Phaser.Game(config);
-	}
-}
-
 const socket = io("127.0.0.1:8000");
 
-launch();
+socket.emit('userMetamask', [String(user.get("ethAddress")), playerChosen]);
+console.log(user.get("ethAddress") + " " + "logged in")
+userAddress = user.get("ethAddress")  
 
 let block_list = {
-    'magma': {
-        image: 'assets/Blocks/Rust.jpg',
+	'magma': {
+		image: 'assets/Blocks/Rust.jpg',
         danger: 70,
         iron: 4000,
         diamond: 400
     },
     'grass': {
-        image: 'assets/Blocks/Grass.jpg',
+		image: 'assets/Blocks/Grass.jpg',
         danger: 5,
         iron: 1000,
         diamond: 40
     },
     'medieval': {
-        image: 'assets/Blocks/Destroyed.jpg',
+		image: 'assets/Blocks/Destroyed.jpg',
         danger: 10,
         iron: 3000,
         diamond: 200
     },
     'stone': {
-        image: 'assets/Blocks/Yellow_brick.jpg',
+		image: 'assets/Blocks/Yellow_brick.jpg',
         danger: 10,
         iron: 2000,
         diamond: 100
@@ -81,9 +66,9 @@ var config = {
 	height: 720,
 	width: 960,
 	physics: {
-        default: 'arcade',
+		default: 'arcade',
         arcade: {
-            gravity: { y: 0 },
+			gravity: { y: 0 },
             debug: false
         }
     },
@@ -93,6 +78,8 @@ var config = {
 		update: update
 	}
 };
+
+game = new Phaser.Game(config);
 
 // Game variable
 // var game = new Phaser.Game(config);
@@ -181,17 +168,17 @@ socket.on('gameOver', winner => {
 })
 
 function submitMoves() {
-	console.log(thisRoundMoves)
 	thisRoundMoves['techInvestment'] = {
 		'value': Math.min(parseInt(document.getElementById('tech_investment').value), selfPlayer.iron),
 	}
 	socket.emit('moveSubmission', thisRoundMoves);
+	console.log("Round " + roundNumber + " submitted")
 	submitted.push(roundNumber);
 }
 
 document.getElementById('submitButton').addEventListener('click', submitMoves);
 
-async function create() {
+function create() {
 	scene = this;
 	socket.emit('ready', 'XYZ');
 	var width = 70;

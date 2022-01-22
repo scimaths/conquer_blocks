@@ -115,6 +115,7 @@ io.on('connection', socket => {
     socket.on('ready', value => {
         if (users.length == 2) {
             io.emit('gameBoardObject', gameBoard);
+            console.log("Game Board sent")
         }
     })
 
