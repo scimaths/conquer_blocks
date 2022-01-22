@@ -13,3 +13,10 @@ We drew major inspiration from India's rich history of dynasties - kings after k
 <img src="https://user-images.githubusercontent.com/81357954/149632588-1eb23c37-891f-46cc-a5fb-accef85c73cf.jpeg" width="600" height="400">
 
 <img src="https://user-images.githubusercontent.com/81357954/149632541-e4db8200-e880-4e25-bb9e-380b4a38c504.jpeg" width="600" height="400">
+
+### How to run
+1. Make a clone of this repo - `git clone www.github.com/scimaths/conquer_blocks`
+2. Navigate to the server folder, run `npm i`
+3. Run `nodemon server` from within the server folder
+4. Open a new window for the `client` folder, use VSC's Live Server Extension to "Go Live"
+5. Start from the `index.html` page, enjoy the game!
